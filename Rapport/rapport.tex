@@ -1,0 +1,116 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Projet de Séries Temporelles},
+            pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs}
+% Fix footnotes in tables (requires footnote package)
+\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{longtable}}{}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Projet de Séries Temporelles}
+\author{Kim Antunez et Alain Quartier-la-Tente}
+\date{31/03/2020}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\hypertarget{partie-1-les-donnuxe9es}{%
+\section{Partie 1 : Les données}\label{partie-1-les-donnuxe9es}}
+
+\hypertarget{question-1-description-de-la-suxe9rie-choisie}{%
+\subsection{Question 1 : description de la série choisie}\label{question-1-description-de-la-suxe9rie-choisie}}
+
+Pour ce projet, nous avons choisi de travailler sur la série d'indice de production industrielle (IPI) dans l'industrie chimique (identifiant : 010537908). Il s'agit d'une série au niveau A38 de la nomenclature d'activités française révision 2 (NAF rév. 2), poste CE.
+
+C'est un indice de Laspeyres chaîné avec des pondérations annuelles en valeur ajouté. Il est de base 2015. L'IPI dans l'industrie chimique est calculé à partir de l'enquête mensuelle de branche. Il est calculé par agrégation de séries ``élémentaires'' calculées à un niveau plus fin. Ces séries élémentaires sont estimées en volume : la série d'IPI dans l'industrie chimique ne tient donc pas compte des variations de prix.
+
+Les séries de l'IPI sont corrigées des variations saisonnières et des jours ouvrables (CVS-CJO) à partir de la méthode X13-ARIMA. La désaisonnalisation est réalisée de manière indirecte : elle est effectuée à un niveau fin et les agrégats CVS-CJO sont ensuite calculés directement à partir de ces séries en agrégeant les séries CVS-CJO. Cette désaisonnalisation est réalisée par sous-période pour prendre en compte le fait que la structure économique des séries a beaucoup évolué en 30 ans, et donc qu'il serait peut pertinent d'appliquer un seul modèle de désaisonnalisation sur l'ensemble de la période. Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
+
+Les séries CVS-CJO avant et après 2012 n'étant pas évalués sur les mêmes modèles, et pour éviter des ruptures liées à ce changement de modèle, l'idéal serait d'étudier notre série après janvier 2012. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA. C'est pourquoi nous allons étudier la série d'IPI dans l'industrie chimique entre \textbf{janvier 2010 et décembre 2019}\footnote{Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020}, c'est-à-dire sur \textbf{120 observations}.
+
+Nous n'effectuerons pas de correction de point atypique ou de transformation logarithmique.
+
+\hypertarget{partie-2-moduxe8les-arima}{%
+\section{Partie 2 : Modèles ARIMA}\label{partie-2-moduxe8les-arima}}
+
+Pour les tableaux on peut s'inspirer de ce qui est fait dans \texttt{rjdmarkdown} : \url{https://aqlt.github.io/rjdmarkdown/articles/rjdmarkdown-pdf.pdf}
+
+\hypertarget{partie-3-pruxe9visions}{%
+\section{Partie 3 : Prévisions}\label{partie-3-pruxe9visions}}
+
+\hypertarget{question-6-construction-dun-intervalle-de-confiance}{%
+\subsection{Question 6 : construction d'un intervalle de confiance}\label{question-6-construction-dun-intervalle-de-confiance}}
+
+Refaire cette partie là
+\url{https://otexts.com/fpp2/arima-forecasting.html}
+
+\hypertarget{question-7-question-ouverte}{%
+\subsection{Question 7 : question ouverte}\label{question-7-question-ouverte}}
+
+Granger
+
+\end{document}
