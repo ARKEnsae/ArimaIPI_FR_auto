@@ -16,3 +16,13 @@ AQLTools::graph_ts(window(data,start = 2012))
 
 RJDemetra::regarima_x13(ipi_ce)
 
+
+ipi_c4 <- AQLTools::lectureBDM("010537912")
+# ipi_c4_brut <- AQLTools::lectureBDM("010537923")
+plot(diff(window(ipi_ce,
+				 start = c(2010, 1),
+				 end = c(2019,12)),1))
+plot(diff(window(ipi_c4,
+	   start = c(2010, 1),
+	   end = c(2019,12)),1)) # peut-être mieux d'utiliser cette série, pas de problème heteroscedasticité
+plot(ipi_c4)
