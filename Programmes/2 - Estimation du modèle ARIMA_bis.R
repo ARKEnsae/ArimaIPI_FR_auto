@@ -11,14 +11,15 @@ pacf(x_st) # p_max = 3
 Acf(x_st)
 Pacf(x_st)
 
-ggAcf(x_st) + labs(title = "ACF") + 
+ggAcf(x_st) + labs(title = "ACF") +
 	ggPacf(x_st) + labs(title = "PACF")
 
 # On va tester tous les modèles pour q <= 4, p <= 3
 
-evaluation_model <- function(order, x, lags = 24){
+evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 	# ici on utilise Arima plutôt que arima pour la fonction accuracy
-	model <- forecast::Arima(x, order = order)
+	model <- forecast::Arima(x, order = order,
+							 include.mean = include.mean)
 	residus <- residuals(model)
 	lbtest <- t(sapply(1:lags,function(l){
 		if(l <= sum(model$arma[1:2])){
@@ -47,7 +48,7 @@ evaluation_model <- function(order, x, lags = 24){
 		)
 	}))
 	jbtest <- tseries::jarque.bera.test(residus)
-	ttest <- lmtest::coeftest(model)
+	ttest <- tryCatch(lmtest::coeftest(model), error = function(e) 0)
 	qualite <- c(AIC(model), BIC(model), accuracy(model))
 	names(qualite) <- c("AIC", "BIC", colnames(accuracy(model)))
 	list(model = model,
@@ -59,7 +60,8 @@ evaluation_model <- function(order, x, lags = 24){
 }
 
 models_possibles <- expand.grid(p = 0:1, d = 0, q = 0:1)
-models_evalues <- apply(models_possibles,1, evaluation_model, x = x_st)
+models_evalues <- apply(models_possibles,1, evaluation_model, x = x_st,
+						include.mean = FALSE)
 names(models_evalues) <- sprintf("ARIMA(%i,%i,%i)", models_possibles[,"p"],
 								 models_possibles[,"d"], models_possibles[,"q"])
 ## Pour éviter de tout écrire à la main :
@@ -73,10 +75,11 @@ models_evalues$`ARIMA(0,0,1)`
 # Modele bon
 models_evalues$`ARIMA(1,0,1)`
 # coef AR1 non significatif
-models_evalues$`ARIMA(1,0,0)`
-# Il n'y a pas indépendance des résidus
 
-# Bilan : seul modèle vaile : ARIMA(0,1,1)
+# Bilan : seul modèle valide : ARIMA(0,1,1)
+
+qualite_modeles <- sapply(models_evalues, function(x) x$qualite)
+round(qualite_modeles,1)
 
 ordres_retenus <- c(0,1,1)
 saveRDS(ordres_retenus, file = "Rapport/data/bis_ordres_retenus.RDS")
@@ -107,5 +110,5 @@ ggAcf(residus) + labs(title = "ACF") +
 tseries::jarque.bera.test(residus) # résidus normaux : on peut bien faire les ic
 
 #Remarquons que le modèle que le même modèle serait determiné automatiquement
-m <- auto.arima(x, allowdrift = FALSE)
+m <- auto.arima(x)
 m
