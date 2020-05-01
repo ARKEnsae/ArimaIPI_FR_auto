@@ -13,47 +13,239 @@ output:
         fig_caption: true
         highlight: default
         keep_tex: yes
+urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,
+knitr::opts_chunk$set(echo = FALSE,
   collapse = TRUE,
   fig.path = "img/rmd-",
   fig.align = "center",
-  warning = FALSE)
+  fig.width = 8, fig.height = 3,
+  warning = FALSE,
+  message = FALSE)
+options(knitr.kable.NA = ' ')
+source("fonctions_rapport.R",encoding = "UTF-8")
 ```
+
 
 # Partie 1 : Les données
 
 ## Question 1 : description de la série choisie
 
-Pour ce projet, nous avons choisi de travailler sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940). Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2), poste CL1.
-Cela concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d’aménagement de véhicules automobiles. Cette production intègre donc la filière complète, y compris moteurs et or- ganes mécaniques en amont, dès lors qu’ils sont principalement destinés à des véhicules automobiles (à l’exception des parties de moteur).
+Pour ce projet, nous avons choisi de travailler sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940). 
+Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2), poste CL1.
+Cela concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d’aménagement de véhicules automobiles. 
+Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu’ils sont principalement destinés à des véhicules automobiles (à l’exception des parties de moteur).
 
-C'est un indice de Laspeyres chaîné avec des pondérations annuelles en valeur ajouté. Il est de base 2015. L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche. Il est calculé par agrégation de séries "élémentaires" calculées à un niveau plus fin. Ces séries élémentaires sont estimées en volume : la série d'IPI dans l'industrie automobile ne tient donc pas compte des variations de prix.
+C'est un indice de Laspeyres chaîné avec des pondérations annuelles en valeur ajouté. 
+Il est de base 2015. 
+L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche. 
+Il est calculé par agrégation de séries "élémentaires" calculées à un niveau plus fin. 
+Ces séries élémentaires sont estimées en volume : la série d'IPI dans l'industrie automobile ne tient donc pas compte des variations de prix.
 
-Les séries de l'IPI sont corrigées des variations saisonnières et des jours ouvrables (CVS-CJO) à partir de la méthode X13-ARIMA. La désaisonnalisation est réalisée de manière indirecte :  elle est effectuée à un niveau fin et les agrégats CVS-CJO sont ensuite calculés directement à partir de ces séries en agrégeant les séries CVS-CJO. Cette désaisonnalisation est réalisée par sous-période pour prendre en compte le fait que la structure économique des séries a beaucoup évolué en 30 ans, et donc qu'il serait peut pertinent d'appliquer un seul modèle de désaisonnalisation sur l'ensemble de la période. Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
+Les séries de l'IPI sont corrigées des variations saisonnières et des jours ouvrables (CVS-CJO) à partir de la méthode X13-ARIMA. 
+La désaisonnalisation est réalisée de manière indirecte :  elle est effectuée à un niveau fin et les agrégats CVS-CJO sont ensuite calculés directement à partir de ces séries en agrégeant les séries CVS-CJO. 
+Cette désaisonnalisation est réalisée par sous-période pour prendre en compte le fait que la structure économique des séries a beaucoup évolué en 30 ans, et donc qu'il serait peut pertinent d'appliquer un seul modèle de désaisonnalisation sur l'ensemble de la période. 
+Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
 
-Les séries CVS-CJO avant et après 2012 n'étant pas évalués sur les mêmes modèles, et pour éviter des ruptures liées à ce changement de modèle, l'idéal serait d'étudier notre série après janvier 2012. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA. C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre **janvier 2010 et décembre 2019**^[Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020], c'est-à-dire sur **120 observations**.
+Les séries CVS-CJO avant et après 2012 n'étant pas évalués sur les mêmes modèles, et pour éviter des ruptures liées à ce changement de modèle, l'idéal serait d'étudier notre série après janvier 2012. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA. 
+C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre **janvier 2010 et décembre 2019**^[Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.], c'est-à-dire sur **120 observations**.
 
 Nous n'effectuerons pas de correction de point atypique ou de transformation logarithmique.
 
+## Questions 2 et 3
+
+```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement)"}
+data <- readRDS(file = "data/donnees.RDS")
+models_evalues <- readRDS(file = "data/models_evalues.RDS")
+x <- data[,"ipi_cl1"]
+x_st <- diff(x, 1)
+p1 <- AQLTools::graph_ts(window(x,
+								start = c(2009,10),
+								end = c(2020,2),
+								extend = TRUE), x_lab = "Dates", y_lab = NULL, n_xlabel = 12)
+p1
+```
+
+
+Le graphique \@ref(fig:ipiBrut) ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes de tendance croissante (2010-2011, 2013-2018) et de tendance décroissance (2011-2013 et 2018-2020). 
+La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement pas stationnaire. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) dans le cas avec une constante non nulle et sans tendance, puisqu'on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \@ref(tab:tabTestsInit)). 
+C'est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de racine unitaire de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 % (ici l'hypothèse alternative est la non-stationnarité de la série).
+
+
+```{r tabTestsInit}
+adf <- adfTest(x, type = "c",lags = 2)
+pp <- PP.test(x) 
+kpss <- tseries::kpss.test(x)
+test_stationnarite(adf, pp, kpss,
+                   titre = "Tests de racine unitaire et de stationnarité sur la série d'IPI dans l'automobile")
+```
+
+
+D'après le graphique \@ref(fig:ipiBrut), la série différenciée semble stationnaire. 
+C'est confirmé par le test de Dickey-Fuller augmenté, effectué avec une constante nulle et sans tendance, le test de Phillips-Perron et le test KPSS (tableau \@ref(tab:tabTestsDiff)).
+
+```{r tabTestsDiff}
+adf <- adfTest(x_st, type = "c",lags = 1)
+pp <- PP.test(x_st) 
+kpss <- tseries::kpss.test(x_st)
+test_stationnarite(adf, pp, kpss,
+                   titre = "Tests de racine unitaire et de stationnarité sur la série différenciée d'IPI dans l'automobile")
+```
+
+```{r compGraph, fig.cap= "IPI dans l'automobile (CVS-CJO) sans et avec différentiation"}
+p1 <- AQLTools::graph_ts(window(x,
+								start = c(2009,10),
+								end = c(2020,2),
+								extend = TRUE), 
+								x_lab = "Dates", y_lab = NULL, n_xlabel = 6,
+								titre = "Sans différentiation")
+p2 <- AQLTools::graph_ts(window(x_st,
+								start = c(2009,10),
+								end = c(2020,2),
+								extend = TRUE), x_lab = "Dates", y_lab = NULL, n_xlabel = 6,
+								titre = "Avec différentiation")
+p1 + p2 
+```
+
 # Partie 2 : Modèles ARIMA
 
+Pour déterminer les ordres maximaux, $p_{max}$ et $q_{max}$, du modèle $ARMA(p,q)$ suivi par la série différenciée de l'IPI dans l'automobile, analysons les autocorrélogrammes et les autocorrélogrammes partiels (graphique \@ref(fig:acfPacf)). 
+À partir de retard 2 (inclus), tous les autocorrélogrammes ne sont pas significatifs à 5 \% : on en déduit que $p_{max} = 1$.
+À partir de retard 2 (inclus), tous les autocorrélogrammes partiels ne sont pas significatifs à 5 \% : on en déduit que $q_{max} = 1$.  Pour savoir quel modèle choisir nous allons tester tous les modèles $ARMA(p,q)$ tels que $p\leq 1$ et $q\leq 1$.
 
-Pour les tableaux on peut s'inspirer de ce qui est fait dans `rjdmarkdown` : https://aqlt.github.io/rjdmarkdown/articles/rjdmarkdown-pdf.pdf
+```{r acfPacf, fig.cap="Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile", fig.height=4}
+reformat_graph_acf(ggAcf(x_st)) /
+	reformat_graph_acf(ggPacf(x_st))
+```
+
+
+Quatre modèles ARMA ont donc été testés, sans ajout de constante :
+
+- *ARMA(0,0)* : les résidus de ce modèle ne sont pas indépendants (tableau \@ref(tab:tablbtest)) -> **modèle non retenu**
+
+- *ARMA(1,0)* : les résidus de ce modèle ne sont pas indépendants (tableau \@ref(tab:tablbtest)) -> **modèle non retenu**
+
+- *ARMA(0,1)* : les résidus de ce modèle sont indépendants (tableau \@ref(tab:tablbtest)) et le coefficient associé au MA(1) est significatif (tableau \@ref(tab:tabcoefs)) -> **modèle retenu**
+
+- *ARMA(1,1)* : les résidus de ce modèle sont indépendants (tableau \@ref(tab:tablbtest)) mais le coefficient associé au AR(1) n'est significatif (tableau \@ref(tab:tabcoefs)) -> **modèle non retenu**
+
+En somme il n'y a qu'un seul modèle ARMA valide sur l'IPI différencié : c'est le modèle ARMA(0,1). 
+Pour l'IPI automobile, $X_t$ on retient donc le modèle ARIMA(0,1,1) suivant :
+$$
+\Delta X_t = \varepsilon_t - \underset{(0,09)}{0,38}\;\varepsilon_{t-1}
+$$
+$\varepsilon_t$ est bien un bruit blanc : les $(\varepsilon_t)_t$ sont indépendants (tableau \@ref(tab:tablbtest)), homoscédastiques (tableau \@ref(tab:tablb2test)) et suivent aussi une loi normale (tableau \@ref(tab:tabjb)).
+
+Parmi l'ensemble des modèles testés, l'ARIMA(0,1,1) est aussi le modèle qui minimise les critères d'information (tableau \&ref(tab:aicbic)).
+
+```{r aicbic}
+format_ic(models_evalues, 
+            titre = "Critères d'information des modèles ARIMA sur l'IPI de l'automobile")
+```
+
 
 # Partie 3 : Prévisions
 
 ## Question 6, 7 et 8 : construction d'un intervalle de confiance
 
-Refaire cette partie là
-https://otexts.com/fpp2/arima-forecasting.html
+On cherche désormais à faire une prévision de $X_t$ à l'horizon $T+2$. 
+Notons $\hat\theta_1$ le coefficient associé à la partie MA de notre modèle ARMA(0,1,1), estimé entre janvier 2010 et décembre 2019 ($\hat\theta_1\simeq -0,38$). On a :
+$$
+\Delta X_T = \varepsilon_T + \hat\theta_1\varepsilon_{T-1}
+\iff 
+X_T = X_{T-1} + \varepsilon_T + \hat\theta_1\varepsilon_{T-1}
+$$
+Les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient donc l'équation :
+$$
+\begin{cases}
+\hat X_{T+1\vert T}=X_T - \hat\theta_1\varepsilon_T \\
+\hat X_{T+2\vert T}=\hat X_{T+1\vert T}
+\end{cases}
+$$
+Les erreurs de prévision sont égales à :
+$$
+\begin{cases}
+\hat \varepsilon_{T+1\vert T} = X_{T+1} - \hat X_{T+1\vert T}=
+\varepsilon_{T+1}+(\theta_1-\hat\theta_1)\varepsilon_T
+\\
+\hat \varepsilon_{T+2\vert T} = X_{T+2} - \hat X_{T+2\vert T}=
+\varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}+(\theta_1-\hat\theta_1)\varepsilon_T 
+\end{cases}
+$$
+Les intervalles de confiance de niveau $\alpha$ sur $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$ s'écrivent donc :
+$$
+IC_{1-\alpha}(\hat X_{T+h\vert T}) =
+\left[
+\hat X_{T+h\vert T}-q_{1-\frac \alpha 2}\hat{\sigma}_h\;;\;
+\hat X_{T+h\vert T}+q_{1-\frac \alpha 2}\hat{\sigma}_h
+\right]
+$$
+Avec $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$ et :
+$$
+\hat \sigma_1 = \hat\sigma\text{,}\quad
+\hat\sigma_2=\hat\sigma\sqrt{1+(1+\hat \theta_1)^2}\quad\text{et}
+\quad 
+\hat\sigma = \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
+$$
+(la somme commence à 2 puisque l'on perd une période en différenciant) 
 
+Bilan :
 
-Pour obtenir ces intervalles de confiance il faut que les résidus de notre modèle ARIMA soient indépendants et suivent une loi normale
-The prediction intervals for ARIMA models are based on assumptions that the residuals are uncorrelated and normally distributed. If either of these assumptions does not hold, then the prediction intervals may be incorrect. For this reason, always plot the ACF and histogram of the residuals to check the assumptions before producing prediction intervals.
+$$
+IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
+\\ \hat X_{T+2\vert T}\end{pmatrix}\right) =
+\left[
+\begin{pmatrix} X_T - \hat\theta_1\varepsilon_T 
+\\ X_T - \hat\theta_1\varepsilon_T \end{pmatrix}
+-\hat\sigma q_{1-\frac \alpha 2}
+\begin{pmatrix} 
+1\\
+\sqrt{1+(1+\hat \theta_1)^2}
+\end{pmatrix}\;;\;
+\begin{pmatrix} X_T - \hat\theta_1\varepsilon_T 
+\\ X_T - \hat\theta_1\varepsilon_T 
+\end{pmatrix}
++\hat\sigma q_{1-\frac \alpha 2}
+\begin{pmatrix} 
+1\\
+\sqrt{1+(1+\hat \theta_1)^2}
+\end{pmatrix}
+\right]
+$$
+
+Pour obtenir ces intervalles de confiance il faut que les résidus de notre modèle ARIMA soient indépendants, homoscédastiques et suivent une loi normale : ce qui est bien vérifié dans notre cas. 
+
 
 ## Question 9 : question ouverte
 
 Granger
+
+# (APPENDIX) Appendix {-}
+
+# Annexe 1 : tests supplémentaires sur la qualité des modèles {#sec:qualRes}
+
+
+```{r tablbtest}
+format_testlb(models_evalues, 
+            var = "lbtest",
+            titre = "Tests de Ljung-Box sur les résidus (tests d'autocorrélation) des modèles ARIMA sur l'IPI de l'automobile")
+```
+
+```{r tablb2test}
+format_testlb(models_evalues, 
+            var = "lb2test",
+            titre = "Tests de Ljung-Box sur le carré des résidus (tests d'homoscédasticité) des modèles ARIMA sur l'IPI de l'automobile")
+```
+
+```{r tabjb}
+format_jbtest(models_evalues, 
+            titre = "Tests de Jarque-Bera de normalité des résidus des modèles ARIMA sur l'IPI de l'automobile")
+```
+
+
+```{r tabcoefs}
+format_tab_coef(models_evalues, 
+            titre = "Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile")
+```
