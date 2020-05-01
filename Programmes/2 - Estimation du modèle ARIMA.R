@@ -64,6 +64,7 @@ models_evalues <- apply(models_possibles,1, evaluation_model, x = x_st,
 						include.mean = FALSE)
 names(models_evalues) <- sprintf("ARIMA(%i,%i,%i)", models_possibles[,"p"],
 								 models_possibles[,"d"], models_possibles[,"q"])
+saveRDS(models_evalues, file = "Rapport/data/models_evalues.RDS")
 ## Pour éviter de tout écrire à la main :
 #cat(paste(sprintf("models_evalues$`%s`",names(models_evalues)),collapse = "\n"))
 

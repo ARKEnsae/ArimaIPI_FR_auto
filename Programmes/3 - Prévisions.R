@@ -6,9 +6,14 @@ x <- data[, "ipi_cl1"]
 x_complet <- data_complet[, "ipi_cl1"]
 ordres_retenus <- readRDS(file = "Rapport/data/ordres_retenus.RDS")
 model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
-model_estime
 prev <- forecast(model_estime, h = 2)
 prev
+
+#Retrouver les IC : 
+sum((res - mean(res))^2) / (length(res) - 2) # sigma2
+res <- residuals(model_estime)
+prev$mean[1]+sqrt(model_estime$sigma2)*qnorm(1-0.05/2)
+prev$mean[2]+sqrt(model_estime$sigma2*(1+(1+model_estime$coef[1])^2))*qnorm(1-0.05/2)
 # Graphiques un peu moches à refaire : 
 plot(prev)
 lines(window(x_complet,start = 2020))
