@@ -4,20 +4,22 @@ library(AQLTools)
 library(patchwork)
 
 data <- readRDS(file = "Rapport/data/donnees.RDS")
-x <- data[,"ipi_ce"]
+x <- data[,"ipi_cl1"]
 p1 <- AQLTools::graph_ts(window(x,
-						  start = c(2009,10),
-						  end = c(2020,2),
-						  extend = TRUE), x_lab = "Dates", y_lab = NULL,
-				   titre = "IPI-CE (sans traitement)", n_xlabel = 6)
+								start = c(2009,10),
+								end = c(2020,2),
+								extend = TRUE), x_lab = "Dates", y_lab = NULL,
+						 titre = "IPI-CL1 (sans traitement)", n_xlabel = 6)
 p1
-summary(lm(x-100 ~ time(x)))
-# Il y a une tendance assez nette et une de moyenne  non nulle : 
+t1 <- time(x)*(time(x)<2013)
+t2 <- time(x)*(time(x)>=2013)
+summary(lm(x ~ time(x)+t2))
+
+# Il y a une tendance assez nette et pas de moyenne : 
 # on peut faire le test ADF avec constante et tendance
 # Pour que le test soit valide il faut rajouter des retards :
 # On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :
 # que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)
-
 lb_test <- function(x, lag_max = 24, fitdf = 0){
 	t(sapply(seq_len(lag_max),function(l){
 		if(l <= fitdf){
@@ -56,43 +58,44 @@ adfTest_valid <- function(series, kmax,type){ #tests ADF jusqu’`a des r ́esid
 }
 
 # On trouve un lag de trois :
-adfTest_valid(x, kmax = 24, type = "ct")
+adfTest_valid(x, kmax = 20, type = "ct")
+adfTest_valid(x, kmax = 20, type = "c")#juste constante
 
-adf <- adfTest(x, type = "ct",lags = 3)
+adf <- adfTest(x, type = "ct",lags = 2) #constante et tendance 
+adf
+adf <- adfTest(x, type = "c",lags = 2)#juste constante
 adf # on ne rejette pas : série non stationnaire.
 # A priori c'est donc plutôt une marchine aléatoire qu'une tendance déterministe.
 lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) # vérification tests indépendance
 
-# remarquons que le test de PP donne la conclusion inverse : privilégier ADF
-# car le test de PP est moins puissant.
+# PP et kpss donnent des résultats similaires
 PP.test(x) 
-tseries::kpss.test(x) # série non stationnaire
+tseries::kpss.test(x)
+
 
 # On différentie la série pour la stationnariser :
 x_st <- diff(x, 1)
-summary(lm(x_st ~ time(x_st)))
-
 AQLTools::graph_ts(window(x_st,
 						  start = c(2009,10),
 						  end = c(2020,2),
 						  extend = TRUE), x_lab = "Dates", y_lab = NULL,
-				   titre = "IPI-CE différenciée", n_xlabel = 12)
+				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
+summary(lm(x_st ~ time(x_st)))
+
 # Série qui parait stationnaire même si l'amplitude parait plus importante depuis 2016
 adfTest_valid(x_st, kmax = 24, type = "nc") # lag2
 
-adf <- adfTest(x_st, type = "nc",lags = 2)
+adf <- adfTest(x_st, type = "nc",lags = 1)
 adf # on rejette : série stationnaire.
-lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) # vérification tests indépendance
-
 PP.test(x_st) # vérifié avec test de Phillips-Perron
-tseries::kpss.test(x_st) # vérifié avec test de Phillips-Perron
+tseries::kpss.test(x_st) # vérifié avec KPSS
 
 series_a_tracer <- ts.union(x, x_st)
 p2 <- AQLTools::graph_ts(window(x_st,
 								start = c(2009,10),
 								end = c(2020,2),
 								extend = TRUE), x_lab = "Dates", y_lab = NULL,
-				   titre = "IPI-CE (série différenciée)", n_xlabel = 6)
+						 titre = "IPI-CL1 (série différenciée)", n_xlabel = 6)
 p1 + p2 # pas de tendance et a-priori séries stationnaire
 
 saveRDS(x_st, file = "Rapport/data/x_st.RDS")
