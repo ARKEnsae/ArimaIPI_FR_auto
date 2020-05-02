@@ -110,18 +110,17 @@ Il s'agit d'une série au niveau A64 de la nomenclature d'activités française 
 Cela concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d'aménagement de véhicules automobiles.
 Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu'ils sont principalement destinés à des véhicules automobiles (à l'exception des parties de moteur).
 
-C'est un indice de Laspeyres chaîné avec des pondérations annuelles en valeur ajouté.
+C'est un indice de Laspeyres chaîné avec des pondérations annuelles (les pondérations correspondant aux valeurs ajoutées des branches associées).
 Il est de base 2015.
-L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche.
-Il est calculé par agrégation de séries ``élémentaires'' calculées à un niveau plus fin.
+L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche, par agrégation de séries ``élémentaires'' calculées à un niveau plus fin.
 Ces séries élémentaires sont estimées en volume : la série d'IPI dans l'industrie automobile ne tient donc pas compte des variations de prix.
 
 Les séries de l'IPI sont corrigées des variations saisonnières et des jours ouvrables (CVS-CJO) à partir de la méthode X13-ARIMA.
 La désaisonnalisation est réalisée de manière indirecte : elle est effectuée à un niveau fin et les agrégats CVS-CJO sont ensuite calculés directement à partir de ces séries en agrégeant les séries CVS-CJO.
-Cette désaisonnalisation est réalisée par sous-période pour prendre en compte le fait que la structure économique des séries a beaucoup évolué en 30 ans, et donc qu'il serait peut pertinent d'appliquer un seul modèle de désaisonnalisation sur l'ensemble de la période.
+Cette désaisonnalisation est réalisée par sous-périodes pour prendre en compte le fait que la structure économique des séries a beaucoup évolué en 30 ans, et donc qu'il serait peut pertinent d'appliquer un seul modèle de désaisonnalisation sur l'ensemble de la période.
 Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
 
-Les séries CVS-CJO avant et après 2012 n'étant pas évalués sur les mêmes modèles, et pour éviter des ruptures liées à ce changement de modèle, l'idéal serait d'étudier notre série après janvier 2012. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA.
+Les séries CVS-CJO avant et après 2012 n'étant pas évalués sur les mêmes modèles, l'idéal serait d'étudier notre série après janvier 2012 pour éviter des ruptures liées à ce changement de modèle. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA.
 C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre \textbf{janvier 2010 et décembre 2019}\footnote{Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.}, c'est-à-dire sur \textbf{120 observations}.
 
 Nous n'effectuerons pas de correction de point atypique ou de transformation logarithmique.
@@ -138,8 +137,8 @@ Nous n'effectuerons pas de correction de point atypique ou de transformation log
 \caption{IPI dans l'automobile (CVS-CJO sans traitement)}\label{fig:ipiBrut}
 \end{figure}
 
-Le graphique \ref{fig:ipiBrut} ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes de tendance croissante (2010-2011, 2013-2018) et de tendance décroissance (2011-2013 et 2018-2020).
-La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement pas stationnaire. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) dans le cas avec une constante non nulle et sans tendance, puisqu'on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \ref{tab:tabTestsInit}).
+Le graphique \ref{fig:ipiBrut} ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes à tendance croissante (2010-2011, 2013-2018) et à tendance décroissante (2011-2013 et 2018-2020).
+La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement pas stationnaire. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) avec une constante non nulle et sans tendance : on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \ref{tab:tabTestsInit}).
 C'est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de racine unitaire de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \% (ici l'hypothèse alternative est la non-stationnarité de la série).
 
 \begin{table}[!h]
@@ -201,7 +200,8 @@ KPSS & 0.074 & 0.100 & .\\
 
 Pour déterminer les ordres maximaux, \(p_{max}\) et \(q_{max}\), du modèle \(ARMA(p,q)\) suivi par la série différenciée de l'IPI dans l'automobile, analysons les autocorrélogrammes et les autocorrélogrammes partiels (graphique \ref{fig:acfPacf}).
 À partir de retard 2 (inclus), tous les autocorrélogrammes ne sont pas significatifs à 5 \% : on en déduit que \(p_{max} = 1\).
-À partir de retard 2 (inclus), tous les autocorrélogrammes partiels ne sont pas significatifs à 5 \% : on en déduit que \(q_{max} = 1\). Pour savoir quel modèle choisir nous allons tester tous les modèles \(ARMA(p,q)\) tels que \(p\leq 1\) et \(q\leq 1\).
+À partir de retard 2 (inclus), tous les autocorrélogrammes partiels ne sont pas significatifs à 5 \% : on en déduit que \(q_{max} = 1\).\\
+Ainsi, pour savoir quel modèle choisir nous allons tester tous les modèles \(ARMA(p,q)\) tels que \(p\leq 1\) et \(q\leq 1\).
 
 \begin{figure}
 
@@ -212,7 +212,7 @@ Pour déterminer les ordres maximaux, \(p_{max}\) et \(q_{max}\), du modèle \(A
 \caption{Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile}\label{fig:acfPacf}
 \end{figure}
 
-Quatre modèles ARMA ont donc été testés, sans ajout de constante :
+Quatre modèles ARMA ont été testés, ils ont été estimés sans constante :
 
 \begin{itemize}
 \item
@@ -225,14 +225,14 @@ Quatre modèles ARMA ont donc été testés, sans ajout de constante :
   \emph{ARMA(1,1)} : les résidus de ce modèle sont indépendants (tableau \ref{tab:tablbtest}) mais le coefficient associé au AR(1) n'est significatif (tableau \ref{tab:tabcoefs}) -\textgreater{} \textbf{modèle non retenu}
 \end{itemize}
 
-En somme il n'y a qu'un seul modèle ARMA valide sur l'IPI différencié : c'est le modèle ARMA(0,1).
+En somme, il n'y a qu'un seul modèle ARMA valide sur l'IPI différencié : c'est le modèle ARMA(0,1).
 Pour l'IPI automobile, \(X_t\) on retient donc le modèle ARIMA(0,1,1) suivant :
 \[
 \Delta X_t = \varepsilon_t - \underset{(0,09)}{0,38}\;\varepsilon_{t-1}
 \]
 \(\varepsilon_t\) est bien un bruit blanc : les \((\varepsilon_t)_t\) sont indépendants (tableau \ref{tab:tablbtest}), homoscédastiques (tableau \ref{tab:tablb2test}) et suivent aussi une loi normale (tableau \ref{tab:tabjb}).
 
-Parmi l'ensemble des modèles testés, l'ARIMA(0,1,1) est aussi le modèle qui minimise les critères d'information (tableau \&ref(tab:aicbic)).
+Parmi l'ensemble des modèles testés, l'ARIMA(0,1,1) est aussi le modèle qui minimise les critères d'information (tableau \ref{tab:aicbic}).
 
 \begin{table}[!h]
 
@@ -327,13 +327,16 @@ IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 
 Pour obtenir ces intervalles de confiance il faut que les résidus de notre modèle ARIMA soient indépendants, homoscédastiques et suivent une loi normale : ce qui est bien vérifié dans notre cas.
 
-Le graphique XXX montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020. On retrouve ce que l'on a montré par l'équation \eqref{eq:icPrev} : on prévoit la même valeur en \(X_{T+1}\) et \(X_{T+2}\) et plus l'horizon augmente plus l'incertitude autour de la prévision (i.e : l'intervalle de confiance) augmente. Cela parait peu cohérent économiquement de garder la même prévision pour les deux dates mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
+Le graphique XXX montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020.
+On retrouve ce que l'on a montré par l'équation \eqref{eq:icPrev} : on prévoit la même valeur en \(X_{T+1}\) et \(X_{T+2}\) et plus l'horizon augmente plus l'incertitude autour de la prévision (i.e : l'intervalle de confiance) augmente.
+Cela parait peu cohérent économiquement de garder la même prévision pour les deux dates mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
 
 \begin{itemize}
 \item
   Puisqu'il y a aucun ordre autorégressif, \(\Delta X_t\) ne dépend pas des valeurs passées prises par \((\Delta X_{t'})_{t'\leq t-1}\).
 \item
-  Puisque l'ordre MA est égale à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour \(\Delta X_{t+h}\), \(h\geq 2\), est une prévision nulle, et donc pour \(X_{t+h}\) la seule prévision possible est \(\hat X_{t+1\vert t}\). Cette incertitude se traduit par une rapide augmentation de l'intervalle de confiance.
+  Puisque l'ordre MA est égale à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour \(\Delta X_{t+h}\), \(h\geq 2\), est une prévision nulle, et donc pour \(X_{t+h}\) la seule prévision possible est \(\hat X_{t+1\vert t}\).
+  Cette incertitude se traduit par une rapide augmentation de l'intervalle de confiance.
 \end{itemize}
 
 \hypertarget{question-9-question-ouverte}{%
