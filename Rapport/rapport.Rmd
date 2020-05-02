@@ -192,31 +192,43 @@ $$
 (la somme commence à 2 puisque l'on perd une période en différenciant) 
 
 Bilan :
-
-$$
+\begin{equation}
 IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 \\ \hat X_{T+2\vert T}\end{pmatrix}\right) =
 \left[
-\begin{pmatrix} X_T - \hat\theta_1\varepsilon_T 
-\\ X_T - \hat\theta_1\varepsilon_T \end{pmatrix}
--\hat\sigma q_{1-\frac \alpha 2}
-\begin{pmatrix} 
-1\\
-\sqrt{1+(1+\hat \theta_1)^2}
-\end{pmatrix}\;;\;
-\begin{pmatrix} X_T - \hat\theta_1\varepsilon_T 
-\\ X_T - \hat\theta_1\varepsilon_T 
-\end{pmatrix}
-+\hat\sigma q_{1-\frac \alpha 2}
-\begin{pmatrix} 
-1\\
-\sqrt{1+(1+\hat \theta_1)^2}
-\end{pmatrix}
+  \begin{pmatrix} 
+    X_T - \hat\theta_1\varepsilon_T 
+    \\ X_T - \hat\theta_1\varepsilon_T 
+  \end{pmatrix}
+  -
+  \hat\sigma q_{1-\frac \alpha 2}
+  \begin{pmatrix} 
+    1\\
+    \sqrt{1+(1+\hat \theta_1)^2}
+  \end{pmatrix}
+  \;;\;
+  \begin{pmatrix} 
+    X_T - \hat\theta_1\varepsilon_T 
+    \\ X_T - \hat\theta_1\varepsilon_T 
+  \end{pmatrix}
+  +
+  \hat\sigma q_{1-\frac \alpha 2}
+  \begin{pmatrix} 
+    1\\
+    \sqrt{1+(1+\hat \theta_1)^2}
+  \end{pmatrix}
 \right]
-$$
+(\#eq:icPrev)
+\end{equation}
 
 Pour obtenir ces intervalles de confiance il faut que les résidus de notre modèle ARIMA soient indépendants, homoscédastiques et suivent une loi normale : ce qui est bien vérifié dans notre cas. 
 
+
+Le graphique XXX montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020. On retrouve ce que l'on a montré par l'équation \@ref(eq:icPrev) : on prévoit la même valeur en $X_{T+1}$ et $X_{T+2}$ et plus l'horizon augmente plus l'incertitude autour de la prévision (i.e : l'intervalle de confiance) augmente. Cela parait peu cohérent économiquement de garder la même prévision pour les deux dates mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
+
+- Puisqu'il y a aucun ordre autorégressif, $\Delta X_t$ ne dépend pas des valeurs passées prises par $(\Delta X_{t'})_{t'\leq t-1}$.
+
+- Puisque l'ordre MA est égale à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour $\Delta X_{t+h}$, $h\geq 2$, est une prévision nulle, et donc pour $X_{t+h}$ la seule prévision possible est $\hat X_{t+1\vert t}$. Cette incertitude se traduit par une rapide augmentation de l'intervalle de confiance.
 
 ## Question 9 : question ouverte
 
