@@ -14,9 +14,13 @@ output:
         highlight: default
         keep_tex: yes
 urlcolor: blue
+themeoptions: "coding=utf8,language=french"
+classoption: 'french'
+geometry: margin=0.95in
+lang: "french"
+documentclass: "article"
 header-includes:
 - \usepackage{fontawesome}
-
 ---
 
 ```{r setup, include=FALSE}
@@ -30,6 +34,9 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = ' ')
 source("fonctions_rapport.R",encoding = "UTF-8")
 ```
+
+
+\newpage
 
 
 # Partie 1 : Les données
@@ -58,9 +65,12 @@ Nous n'effectuons pas ici de correction de point atypique ou de transformation l
 
 ```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement)"}
 data <- readRDS(file = "data/donnees.RDS")
+data_complet <- readRDS(file = "data/donnees_completes.RDS")
 models_evalues <- readRDS(file = "data/models_evalues.RDS")
 x <- data[,"ipi_cl1"]
-x_st <- diff(x, 1)
+x_st <- readRDS(file = "data/x_st.RDS")
+x_complet <- data_complet[, "ipi_cl1"]
+
 p1 <- AQLTools::graph_ts(window(x,
 								start = c(2009,10),
 								end = c(2020,2),
@@ -227,18 +237,33 @@ IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 
 Pour obtenir ces intervalles de confiance il faut que les résidus de notre modèle ARIMA soient indépendants, homoscédastiques et suivent une loi normale : ce qui est bien vérifié dans notre cas. 
 
-Le graphique XXX montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020. 
+```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)"}
+ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
+model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
+prev <- forecast(model_estime, h = 2)
+
+graph_prev(x, x_complet, prev, n_xlabel = 12)
+```
+
+
+Le graphique \@ref(fig:prevIpi) montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020. 
 On retrouve ce que l'on a montré par l'équation \@ref(eq:icPrev) : on prévoit la même valeur en $X_{T+1}$ et $X_{T+2}$ et plus l'horizon augmente plus l'incertitude autour de la prévision (i.e : l'intervalle de confiance) augmente. 
 Cela parait peu cohérent économiquement de garder la même prévision pour les deux dates mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
 
 - Puisqu'il y a aucun ordre autorégressif, $\Delta X_t$ ne dépend pas des valeurs passées prises par $(\Delta X_{t'})_{t'\leq t-1}$.
 
 - Puisque l'ordre MA est égale à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour $\Delta X_{t+h}$, $h\geq 2$, est une prévision nulle, et donc pour $X_{t+h}$ la seule prévision possible est $\hat X_{t+1\vert t}$. 
-Cette incertitude se traduit par une rapide augmentation de l'intervalle de confiance.
+Cette incertitude se traduit par un intervalle de confiance très grand^[On prévoit une évolution mensuelle entre janvier 2020 et décembre 2019 comprise entre -7,3 \% et +7,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1, sa moyenne de 0,1).
+] et une rapide augmentation de cet intervalle.
+
+
+
 
 ## Question 9 : question ouverte sur la causalité
 
 Granger
+
+\newpage
 
 # (APPENDIX) Appendix {-}
 

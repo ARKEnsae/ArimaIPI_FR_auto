@@ -2,7 +2,7 @@
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
 %
-\documentclass[]{article}
+\documentclass[,french]{article}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -35,11 +35,12 @@
             pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
             colorlinks=true,
             linkcolor=Maroon,
+            filecolor=Maroon,
             citecolor=Blue,
             urlcolor=blue,
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=0.95in]{geometry}
 \usepackage{longtable,booktabs}
 % Fix footnotes in tables (requires footnote package)
 \IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{longtable}}{}
@@ -71,29 +72,7 @@
 \def\fps@figure{htbp}
 \makeatother
 
-\usepackage{etoolbox}
-\makeatletter
-\providecommand{\subtitle}[1]{% add subtitle to \maketitle
-  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
-}
-\makeatother
 \usepackage{fontawesome}
-% https://github.com/rstudio/rmarkdown/issues/337
-\let\rmarkdownfootnote\footnote%
-\def\footnote{\protect\rmarkdownfootnote}
-
-% https://github.com/rstudio/rmarkdown/pull/252
-\usepackage{titling}
-\setlength{\droptitle}{-2em}
-
-\pretitle{\vspace{\droptitle}\centering\huge}
-\posttitle{\par}
-
-\preauthor{\centering\large\emph}
-\postauthor{\par}
-
-\predate{\centering\large\emph}
-\postdate{\par}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -108,6 +87,13 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[shorthands=off,main=]{babel}
+\else
+  % load polyglossia as late as possible as it *could* call bidi if RTL lang (e.g. Hebrew or Arabic)
+  \usepackage{polyglossia}
+  \setmainlanguage[]{}
+\fi
 
 \title{Projet de Séries Temporelles}
 \author{Kim Antunez et Alain Quartier-la-Tente}
@@ -121,6 +107,8 @@
 \setcounter{tocdepth}{3}
 \tableofcontents
 }
+\newpage
+
 \hypertarget{partie-1-les-donnuxe9es}{%
 \section{Partie 1 : Les données}\label{partie-1-les-donnuxe9es}}
 
@@ -346,7 +334,16 @@ IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 
 Pour obtenir ces intervalles de confiance il faut que les résidus de notre modèle ARIMA soient indépendants, homoscédastiques et suivent une loi normale : ce qui est bien vérifié dans notre cas.
 
-Le graphique XXX montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020.
+\begin{figure}
+
+{\centering \includegraphics{img/rmd-prevIpi-1} 
+
+}
+
+\caption{Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:prevIpi}
+\end{figure}
+
+Le graphique \ref{fig:prevIpi} montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020.
 On retrouve ce que l'on a montré par l'équation \eqref{eq:icPrev} : on prévoit la même valeur en \(X_{T+1}\) et \(X_{T+2}\) et plus l'horizon augmente plus l'incertitude autour de la prévision (i.e : l'intervalle de confiance) augmente.
 Cela parait peu cohérent économiquement de garder la même prévision pour les deux dates mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
 
@@ -355,13 +352,15 @@ Cela parait peu cohérent économiquement de garder la même prévision pour les
   Puisqu'il y a aucun ordre autorégressif, \(\Delta X_t\) ne dépend pas des valeurs passées prises par \((\Delta X_{t'})_{t'\leq t-1}\).
 \item
   Puisque l'ordre MA est égale à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour \(\Delta X_{t+h}\), \(h\geq 2\), est une prévision nulle, et donc pour \(X_{t+h}\) la seule prévision possible est \(\hat X_{t+1\vert t}\).
-  Cette incertitude se traduit par une rapide augmentation de l'intervalle de confiance.
+  Cette incertitude se traduit par un intervalle de confiance très grand\footnote{On prévoit une évolution mensuelle entre janvier 2020 et décembre 2019 comprise entre -7,3 \% et +7,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1, sa moyenne de 0,1).} et une rapide augmentation de cet intervalle.
 \end{itemize}
 
 \hypertarget{question-9-question-ouverte-sur-la-causalituxe9}{%
 \subsection{Question 9 : question ouverte sur la causalité}\label{question-9-question-ouverte-sur-la-causalituxe9}}
 
 Granger
+
+\newpage
 
 \hypertarget{appendix-appendix}{%
 \appendix}
@@ -418,8 +417,6 @@ Retards & Statistique & p-valeur &  & Statistique & p-valeur &  & Statistique & 
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}
-
-\textbackslash{}begin\{figure\}{[}htp{]}
 
 \begin{table}[!h]
 

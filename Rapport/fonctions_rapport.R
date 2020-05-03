@@ -217,3 +217,58 @@ format_ic <- function(models_evalues, titre = "",
 		kable_styling(latex_options = c("hold_position")) 
 }
 
+############################
+### Graphique prévisions ###
+############################
+
+graph_prev <- function(x, x_complet, prev, n_xlabel = 12){
+	
+	ts2df <- function(data){
+		time <- time(data)
+		freq <- frequency(data)
+		dataGraph <- data.frame(cbind(time, data))
+		colnames(dataGraph) <- c("date", "value")
+		dataGraph
+	}
+	data_etud <- window(x, start = c(2016,12))
+	data_fin <- window(x_complet, start = c(2019,12))
+	prevs <- ts(c(tail(prev$x,1), prev$mean),
+				start = end(prev$x),
+				frequency = 12)
+	dataGraph <- ts2df(data_etud)
+	prevs_df <- ts2df(prevs)
+	data_fin_df <- ts2df(data_fin)
+	
+	ic_df <- ts2df(ts.union(prev$mean,prev$lower[,"95%"],prev$upper[,"95%"]))
+	colnames(ic_df) <- c("x","level", "ymin", "ymax")
+	
+	
+	p <- ggplot(data = dataGraph, aes(x = date, y = value))+
+		geom_line(size=0.70, aes(color = "ipi")) +
+		geom_ribbon(mapping = aes(x = x, ymin = ymin, ymax = ymax, fill = "ic"),
+					data = ic_df, inherit.aes = FALSE, alpha = 0.2)+
+		geom_point(data = data_fin_df, aes(color = "ipireel"))+
+		geom_line(data = data_fin_df, size=0.7,
+				  linetype = "longdash", aes(color = "ipireel"))+
+		geom_point(data = prevs_df, aes(color = "prev"))+
+		geom_line(data = prevs_df, size=0.7,
+				  linetype = "longdash", aes(color = "prev"))+
+		scale_x_continuous(breaks = scales::pretty_breaks(n = n_xlabel),
+						   labels = function(x) AQLTools:::creation_x_label(x, x_lab_month = TRUE))+
+		AQLTools:::theme_aqltools() +
+		labs(title = NULL,
+			 x = NULL, y = NULL)  +
+		scale_colour_manual(name = "Légende",
+							breaks = c("ipi", "ipireel", "prev"),
+							labels = c("IPI", "IPI observé", "IPI prévu ARIMA(0,1,1)"),
+							values = c("black", "black", "red")) +
+		scale_fill_manual(name = "Légende",
+						  breaks = "ic",
+						  labels = c("IC(95%)"),
+						  values = c("black")) +
+		guides(color = guide_legend(keywidth = 2, keyheight = 1,
+									override.aes = list(shape = c(NA,19,19),
+														linetype = c(1,6,6))))
+	p
+	
+}
