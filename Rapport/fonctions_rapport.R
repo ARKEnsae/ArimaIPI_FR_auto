@@ -100,7 +100,8 @@ format_testlb <- function(models_evalues, var = "lbtest", titre = "",
 			  align = c("c"))  %>% 
 		add_header_above(header) %>% 
 		kable_styling(latex_options = c("hold_position",  "scale_down")) %>% 
-		footnote(general = footnote_stars,
+		footnote(general = c(footnote_stars,
+							 "L’hypothèse (H0) d’homoscedasticité des résidus n’est pas rejetée à 5 \\\\% sur les 24 périodes pour l’ensemble des modèles et en particulier pour le modèle retenu ARIMA(0,1,1)."),
 				 general_title = "",
 				 escape = FALSE,
 				 threeparttable = TRUE)
@@ -119,7 +120,7 @@ format_jbtest <- function(models_evalues, titre = "",
 	colnames(data_test)[1:2] <- c("Statistique", "p-valeur")
 	rownames(data_test) <- gsub(",0,",",1,", names(models_evalues))
 	
-	footnotejb <- "Le test de Jarque-Bera suppose que les résidus soient indépendants et homoscédastiques"
+	footnotejb <- "Le test de Jarque-Bera suppose que les résidus soient indépendants et homoscédastiques."
 	data_test %>% 
 		kable(digits = digits, format = "latex", escape = FALSE,
 			  caption = titre,
@@ -127,7 +128,8 @@ format_jbtest <- function(models_evalues, titre = "",
 			  booktabs = TRUE,
 			  align = c("c"))  %>% 
 		kable_styling(latex_options = c("hold_position", "repeat_header")) %>% 
-		footnote(general = c(footnote_stars, footnotejb),
+		footnote(general = c(footnote_stars, footnotejb, 
+							 "L’hypothèse (H0) de normalité des résidus n’est pas rejetée à 5 \\\\% pour l’ensemble des modèles et en particulier pour le modèle retenu ARIMA(0,1,1)."),
 				 general_title = "",
 				 escape = FALSE,
 				 threeparttable = TRUE)

@@ -35,7 +35,6 @@
             pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
             colorlinks=true,
             linkcolor=Maroon,
-            filecolor=Maroon,
             citecolor=Blue,
             urlcolor=blue,
             breaklinks=true}
@@ -72,6 +71,29 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\usepackage{fontawesome}
+% https://github.com/rstudio/rmarkdown/issues/337
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+% https://github.com/rstudio/rmarkdown/pull/252
+\usepackage{titling}
+\setlength{\droptitle}{-2em}
+
+\pretitle{\vspace{\droptitle}\centering\huge}
+\posttitle{\par}
+
+\preauthor{\centering\large\emph}
+\postauthor{\par}
+
+\predate{\centering\large\emph}
+\postdate{\par}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -89,7 +111,7 @@
 
 \title{Projet de Séries Temporelles}
 \author{Kim Antunez et Alain Quartier-la-Tente}
-\date{31/03/2020}
+\date{19/05/2020}
 
 \begin{document}
 \maketitle
@@ -105,28 +127,26 @@
 \hypertarget{question-1-description-de-la-suxe9rie-choisie}{%
 \subsection{Question 1 : description de la série choisie}\label{question-1-description-de-la-suxe9rie-choisie}}
 
-Pour ce projet, nous avons choisi de travailler sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940).
+Pour ce projet, travaillons sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940).
 Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2), poste CL1.
-Cela concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d'aménagement de véhicules automobiles.
+L'industrie automobile concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d'aménagement de véhicules automobiles.
 Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu'ils sont principalement destinés à des véhicules automobiles (à l'exception des parties de moteur).
 
-C'est un indice de Laspeyres chaîné avec des pondérations annuelles (les pondérations correspondant aux valeurs ajoutées des branches associées).
-Il est de base 2015.
-L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche, par agrégation de séries ``élémentaires'' calculées à un niveau plus fin.
-Ces séries élémentaires sont estimées en volume : la série d'IPI dans l'industrie automobile ne tient donc pas compte des variations de prix.
+Il s'agit d'un indice de Laspeyres\footnote{Les indices de Laspeyres et de Paasche permettent de synthétiser en un indice unique un certain nombre d'indices. L'indice de Laspeyres, le plus célèbre est l'IPC (indice des prix à la consommation).}, en base 2015, chaîné avec des pondérations annuelles (les pondérations correspondant aux valeurs ajoutées des branches associées).
+L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche, par agrégation de séries ``élémentaires'' estimées en volume\footnote{La série d'IPI dans l'industrie automobile ne tient donc pas compte des variations de prix.}, calculées à un niveau plus fin.
 
 Les séries de l'IPI sont corrigées des variations saisonnières et des jours ouvrables (CVS-CJO) à partir de la méthode X13-ARIMA.
 La désaisonnalisation est réalisée de manière indirecte : elle est effectuée à un niveau fin et les agrégats CVS-CJO sont ensuite calculés directement à partir de ces séries en agrégeant les séries CVS-CJO.
 Cette désaisonnalisation est réalisée par sous-périodes pour prendre en compte le fait que la structure économique des séries a beaucoup évolué en 30 ans, et donc qu'il serait peut pertinent d'appliquer un seul modèle de désaisonnalisation sur l'ensemble de la période.
 Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
 
-Les séries CVS-CJO avant et après 2012 n'étant pas évalués sur les mêmes modèles, l'idéal serait d'étudier notre série après janvier 2012 pour éviter des ruptures liées à ce changement de modèle. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA.
+Les séries CVS-CJO avant et après 2012 n'étant pas évaluées sur les mêmes modèles, l'idéal serait d'étudier notre série après janvier 2012 pour éviter des ruptures liées à ce changement de modèle. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA.
 C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre \textbf{janvier 2010 et décembre 2019}\footnote{Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.}, c'est-à-dire sur \textbf{120 observations}.
 
-Nous n'effectuerons pas de correction de point atypique ou de transformation logarithmique.
+Nous n'effectuons pas ici de correction de point atypique ou de transformation logarithmique.
 
-\hypertarget{questions-2-et-3}{%
-\subsection{Questions 2 et 3}\label{questions-2-et-3}}
+\hypertarget{questions-2-et-3-transformation-de-la-suxe9rie}{%
+\subsection{Questions 2 et 3 : transformation de la série}\label{questions-2-et-3-transformation-de-la-suxe9rie}}
 
 \begin{figure}
 
@@ -138,8 +158,8 @@ Nous n'effectuerons pas de correction de point atypique ou de transformation log
 \end{figure}
 
 Le graphique \ref{fig:ipiBrut} ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes à tendance croissante (2010-2011, 2013-2018) et à tendance décroissante (2011-2013 et 2018-2020).
-La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement pas stationnaire. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) avec une constante non nulle et sans tendance : on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \ref{tab:tabTestsInit}).
-C'est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de racine unitaire de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \% (ici l'hypothèse alternative est la non-stationnarité de la série).
+La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement \textbf{pas stationnaire}. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) avec une constante non nulle et sans tendance : on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \ref{tab:tabTestsInit}).
+Ceci est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de stationnarité\footnote{Ici, l'hypothèse alternative est la non-stationnarité de la série} de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \%.
 
 \begin{table}[!h]
 
@@ -162,8 +182,8 @@ KPSS & 0.892 & 0.010 & **\\
 \end{threeparttable}
 \end{table}
 
-D'après le graphique \ref{fig:ipiBrut}, la série différenciée semble stationnaire.
-C'est confirmé par le test de Dickey-Fuller augmenté, effectué avec une constante nulle et sans tendance, le test de Phillips-Perron et le test KPSS (tableau \ref{tab:tabTestsDiff}).
+D'après le graphique \ref{fig:ipiBrut}, la série différenciée semble \textbf{stationnaire}.
+Cette hypothèse est confirmée par le test de Dickey-Fuller augmenté, effectué avec une constante nulle et sans tendance, le test de Phillips-Perron et le test KPSS (tableau \ref{tab:tabTestsDiff}).
 
 \begin{table}[!h]
 
@@ -198,10 +218,10 @@ KPSS & 0.074 & 0.100 & .\\
 \hypertarget{partie-2-moduxe8les-arima}{%
 \section{Partie 2 : Modèles ARIMA}\label{partie-2-moduxe8les-arima}}
 
-Pour déterminer les ordres maximaux, \(p_{max}\) et \(q_{max}\), du modèle \(ARMA(p,q)\) suivi par la série différenciée de l'IPI dans l'automobile, analysons les autocorrélogrammes et les autocorrélogrammes partiels (graphique \ref{fig:acfPacf}).
-À partir de retard 2 (inclus), tous les autocorrélogrammes ne sont pas significatifs à 5 \% : on en déduit que \(p_{max} = 1\).
-À partir de retard 2 (inclus), tous les autocorrélogrammes partiels ne sont pas significatifs à 5 \% : on en déduit que \(q_{max} = 1\).\\
-Ainsi, pour savoir quel modèle choisir nous allons tester tous les modèles \(ARMA(p,q)\) tels que \(p\leq 1\) et \(q\leq 1\).
+Afin de déterminer les ordres maximaux, \(p_{max}\) et \(q_{max}\), du modèle \(ARMA(p,q)\) suivi par la série différenciée de l'IPI dans l'automobile, nous analysons les autocorrélogrammes et les autocorrélogrammes partiels (graphique \ref{fig:acfPacf}).
+À partir de retard 2 (inclus), aucun autocorrélogramme est significatif à 5 \% : on en déduit que \(p_{max} = 1\).
+À partir de retard 2 (inclus), aucun autocorrélogramme partiel est significatif à 5 \%: on en déduit que \(q_{max} = 1\).\\
+Ainsi, pour savoir quel(s) modèle(s) retenir, nous allons tester tous les modèles \(ARMA(p,q)\) tels que \(p\leq 1\) et \(q\leq 1\).
 
 \begin{figure}
 
@@ -212,21 +232,20 @@ Ainsi, pour savoir quel modèle choisir nous allons tester tous les modèles \(A
 \caption{Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile}\label{fig:acfPacf}
 \end{figure}
 
-Quatre modèles ARMA ont été testés, ils ont été estimés sans constante :
+Quatre modèles ARMA ont donc été testés\footnote{Ils ont été estimés sans constante.} afin de s'assurer de l'indépendance des résidus (tableau \ref{tab:tablbtest}) et, si c'est bien le cas, de la significativité des coefficients associés aux ordres maximaux des parties AR et MA des modèles (tableau \ref{tab:tabcoefs}) :
 
 \begin{itemize}
-\item
-  \emph{ARMA(0,0)} : les résidus de ce modèle ne sont pas indépendants (tableau \ref{tab:tablbtest}) -\textgreater{} \textbf{modèle non retenu}
-\item
-  \emph{ARMA(1,0)} : les résidus de ce modèle ne sont pas indépendants (tableau \ref{tab:tablbtest}) -\textgreater{} \textbf{modèle non retenu}
-\item
-  \emph{ARMA(0,1)} : les résidus de ce modèle sont indépendants (tableau \ref{tab:tablbtest}) et le coefficient associé au MA(1) est significatif (tableau \ref{tab:tabcoefs}) -\textgreater{} \textbf{modèle retenu}
-\item
-  \emph{ARMA(1,1)} : les résidus de ce modèle sont indépendants (tableau \ref{tab:tablbtest}) mais le coefficient associé au AR(1) n'est significatif (tableau \ref{tab:tabcoefs}) -\textgreater{} \textbf{modèle non retenu}
+\item \emph{ARMA(0,0)} : les résidus de ce modèle ne sont pas indépendants \faArrowCircleRight{} \textbf{modèle non retenu}
+
+\item \emph{ARMA(1,0)} : les résidus de ce modèle ne sont pas indépendants \faArrowCircleRight{} \textbf{modèle non retenu}
+
+\item \emph{ARMA(0,1)} : les résidus de ce modèle sont indépendants et le coefficient associé au MA(1) est significatif \faArrowCircleRight{} \textbf{modèle retenu}
+
+\item \emph{ARMA(1,1)} : les résidus de ce modèle sont indépendants (tableau mais le coefficient associé au AR(1) n'est significatif \faArrowCircleRight{} \textbf{modèle non retenu}
 \end{itemize}
 
-En somme, il n'y a qu'un seul modèle ARMA valide sur l'IPI différencié : c'est le modèle ARMA(0,1).
-Pour l'IPI automobile, \(X_t\) on retient donc le modèle ARIMA(0,1,1) suivant :
+Finalement, seul le modèle ARMA(0,1) est valide sur la série différenciée. Sur la série non différenciée de l'IPI automobile, on retient donc le modèle \textbf{ARIMA(0,1,1)} défini mathématiquement par :
+
 \[
 \Delta X_t = \varepsilon_t - \underset{(0,09)}{0,38}\;\varepsilon_{t-1}
 \]
@@ -339,8 +358,8 @@ Cela parait peu cohérent économiquement de garder la même prévision pour les
   Cette incertitude se traduit par une rapide augmentation de l'intervalle de confiance.
 \end{itemize}
 
-\hypertarget{question-9-question-ouverte}{%
-\subsection{Question 9 : question ouverte}\label{question-9-question-ouverte}}
+\hypertarget{question-9-question-ouverte-sur-la-causalituxe9}{%
+\subsection{Question 9 : question ouverte sur la causalité}\label{question-9-question-ouverte-sur-la-causalituxe9}}
 
 Granger
 
@@ -395,9 +414,12 @@ Retards & Statistique & p-valeur &  & Statistique & p-valeur &  & Statistique & 
 \end{tabular}
 \begin{tablenotes}
 \item \hspace{-0.4cm}\textbf{Signif. codes: }0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
+\item L’hypothèse (H0) d’homoscedasticité des résidus n’est pas rejetée à 5 \% sur les 24 périodes pour l’ensemble des modèles et en particulier pour le modèle retenu ARIMA(0,1,1).
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}
+
+\textbackslash{}begin\{figure\}{[}htp{]}
 
 \begin{table}[!h]
 
@@ -443,6 +465,7 @@ Retards & Statistique & p-valeur &  & Statistique & p-valeur &  & Statistique & 
 \end{tabular}
 \begin{tablenotes}
 \item \hspace{-0.4cm}\textbf{Signif. codes: }0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
+\item L’hypothèse (H0) d’homoscedasticité des résidus n’est pas rejetée à 5 \% sur les 24 périodes pour l’ensemble des modèles et en particulier pour le modèle retenu ARIMA(0,1,1).
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}
@@ -464,7 +487,8 @@ ARIMA(1,1,1) & 2.241 & 0.326 & \\
 \end{tabular}
 \begin{tablenotes}
 \item \hspace{-0.4cm}\textbf{Signif. codes: }0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
-\item Le test de Jarque-Bera suppose que les résidus soient indépendants et homoscédastiques
+\item Le test de Jarque-Bera suppose que les résidus soient indépendants et homoscédastiques.
+\item L’hypothèse (H0) de normalité des résidus n’est pas rejetée à 5 \% pour l’ensemble des modèles et en particulier pour le modèle retenu ARIMA(0,1,1).
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
