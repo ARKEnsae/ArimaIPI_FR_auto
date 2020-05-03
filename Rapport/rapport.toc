@@ -1,9 +1,9 @@
 \babel@toc {french}{}
-\contentsline {section}{\numberline {1}Partie 1 : Les données}{2}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Question 1 : description de la série choisie}{2}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Questions 2 et 3 : transformation de la série}{2}{subsection.1.2}%
-\contentsline {section}{\numberline {2}Partie 2 : Modèles ARIMA}{3}{section.2}%
-\contentsline {section}{\numberline {3}Partie 3 : Prévisions}{4}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Question 6, 7 et 8 : construction d'un intervalle de confiance}{4}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Question 9 : question ouverte sur la causalité}{6}{subsection.3.2}%
-\contentsline {section}{\numberline {A}Annexe 1 : tests supplémentaires sur la qualité des modèles}{7}{appendix.A}%
+\contentsline {section}{\numberline {1}Partie 1 : Les données}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Question 1 : description de la série choisie}{1}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Questions 2 et 3 : transformation de la série}{1}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Partie 2 : Modèles ARIMA}{2}{section.2}%
+\contentsline {section}{\numberline {3}Partie 3 : Prévisions}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Question 6, 7 et 8 : construction d'un intervalle de confiance}{3}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Question 9 : question ouverte sur la causalité}{5}{subsection.3.2}%
+\contentsline {section}{\numberline {A}Annexe 1 : tests supplémentaires sur la qualité des modèles}{6}{appendix.A}%
