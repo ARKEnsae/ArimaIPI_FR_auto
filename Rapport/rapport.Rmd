@@ -21,6 +21,8 @@ lang: "french"
 documentclass: "article"
 header-includes:
 - \usepackage{fontawesome}
+- \usepackage{multicol}
+
 ---
 
 ```{r setup, include=FALSE}
@@ -63,7 +65,7 @@ Nous n'effectuons pas ici de correction de point atypique ou de transformation l
 
 ## Questions 2 et 3 : transformation de la série
 
-```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement)"}
+```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement)", include=FALSE}
 data <- readRDS(file = "data/donnees.RDS")
 data_complet <- readRDS(file = "data/donnees_completes.RDS")
 models_evalues <- readRDS(file = "data/models_evalues.RDS")
@@ -78,10 +80,24 @@ p1 <- AQLTools::graph_ts(window(x,
 p1
 ```
 
+```{r compGraph, fig.cap= "IPI dans l'automobile (CVS-CJO) sans et avec différentiation"}
+p1 <- AQLTools::graph_ts(window(x,
+								start = c(2009,10),
+								end = c(2020,2),
+								extend = TRUE), 
+								x_lab = "Dates", y_lab = NULL, n_xlabel = 6,
+								titre = "(a) Sans différentiation")
+p2 <- AQLTools::graph_ts(window(x_st,
+								start = c(2009,10),
+								end = c(2020,2),
+								extend = TRUE), x_lab = "Dates", y_lab = NULL, n_xlabel = 6,
+								titre = "(b) Avec différentiation")
+p1 + p2 
+```
 
-Le graphique \@ref(fig:ipiBrut) ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes à tendance croissante (2010-2011, 2013-2018) et à tendance décroissante (2011-2013 et 2018-2020). 
+Le graphique \@ref(fig:compGraph)-(a) ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes à tendance croissante (2010-2011, 2013-2018) et à tendance décroissante (2011-2013 et 2018-2020). 
 La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement **pas stationnaire**. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) avec une constante non nulle et sans tendance : on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \@ref(tab:tabTestsInit)). 
-Ceci est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de stationnarité^[Ici, l'hypothèse alternative est la non-stationnarité de la série] de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \%.
+Ceci est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de stationnarité^[Ici, l'hypothèse alternative est la non-stationnarité de la série] de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \%. Nous **différencions** donc la série. 
 
 
 
@@ -89,36 +105,27 @@ Ceci est également confirmé par le test de racine unitaire de Phillips-Perron,
 adf <- adfTest(x, type = "c",lags = 2)
 pp <- PP.test(x) 
 kpss <- tseries::kpss.test(x)
-test_stationnarite(adf, pp, kpss,
+t1 <- test_stationnarite(adf, pp, kpss,
                    titre = "Tests de racine unitaire et de stationnarité sur la série d'IPI dans l'automobile")
+t1
 ```
 
 
-D'après le graphique \@ref(fig:ipiBrut), la série différenciée semble **stationnaire**. 
+D'après le graphique \@ref(fig:compGraph)-(b), la série différenciée semble **stationnaire**. 
 Cette hypothèse est confirmée par le test de Dickey-Fuller augmenté, effectué avec une constante nulle et sans tendance, le test de Phillips-Perron et le test KPSS (tableau \@ref(tab:tabTestsDiff)).
+
+
+
 
 ```{r tabTestsDiff}
 adf <- adfTest(x_st, type = "c",lags = 1)
 pp <- PP.test(x_st) 
 kpss <- tseries::kpss.test(x_st)
-test_stationnarite(adf, pp, kpss,
+t2 <- test_stationnarite(adf, pp, kpss,
                    titre = "Tests de racine unitaire et de stationnarité sur la série différenciée d'IPI dans l'automobile")
+t2
 ```
 
-```{r compGraph, fig.cap= "IPI dans l'automobile (CVS-CJO) sans et avec différentiation"}
-p1 <- AQLTools::graph_ts(window(x,
-								start = c(2009,10),
-								end = c(2020,2),
-								extend = TRUE), 
-								x_lab = "Dates", y_lab = NULL, n_xlabel = 6,
-								titre = "Sans différentiation")
-p2 <- AQLTools::graph_ts(window(x_st,
-								start = c(2009,10),
-								end = c(2020,2),
-								extend = TRUE), x_lab = "Dates", y_lab = NULL, n_xlabel = 6,
-								titre = "Avec différentiation")
-p1 + p2 
-```
 
 # Partie 2 : Modèles ARIMA
 
@@ -127,8 +134,8 @@ Afin de déterminer les ordres maximaux, $p_{max}$ et $q_{max}$, du modèle $ARM
 À partir de retard 2 (inclus), aucun autocorrélogramme partiel est significatif à 5 \%: on en déduit que $q_{max} = 1$.  
 Ainsi, pour savoir quel(s) modèle(s) retenir, nous allons tester tous les modèles $ARMA(p,q)$ tels que $p\leq 1$ et $q\leq 1$.
 
-```{r acfPacf, fig.cap="Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile", fig.height=4}
-reformat_graph_acf(ggAcf(x_st)) /
+```{r acfPacf, fig.cap="Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile", fig.height=2}
+reformat_graph_acf(ggAcf(x_st)) +
 	reformat_graph_acf(ggPacf(x_st))
 ```
 
@@ -167,18 +174,35 @@ format_ic(models_evalues,
 On cherche désormais à faire une prévision de $X_t$ à l'horizon $T+2$. 
 Notons $\hat\theta_1$ le coefficient associé à la partie MA de notre modèle ARMA(0,1,1), estimé entre janvier 2010 et décembre 2019 ($\hat\theta_1\simeq -0,38$). On a :
 $$
-\Delta X_T = \varepsilon_T + \hat\theta_1\varepsilon_{T-1}
+\Delta X_T = \varepsilon_T + \theta_1\varepsilon_{T-1}
 \iff 
-X_T = X_{T-1} + \varepsilon_T + \hat\theta_1\varepsilon_{T-1}
+X_T = X_{T-1} + \varepsilon_T + \theta_1\varepsilon_{T-1}
 $$
-Les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient donc l'équation :
+
+On cherche à construire un intervalle confiance de niveau $\alpha$ de $X_{T+h\vert T}$ pour $t \in \{1,2\}$ : 
+
+$$
+%P_{(Ho)} (X_{T+h\vert T} \in IC_{1-\alpha}   ) = 
+P_{(Ho)} (\lvert \hat \varepsilon_{T+2\vert T} \rvert \leq q_{1-\frac \alpha 2}  ) = 1-\alpha
+\iff 
+IC_{1-\alpha}(X_{T+h\vert T}) =
+\left[
+\hat X_{T+h\vert T}-q_{1-\frac \alpha 2}\hat{\sigma}_h\;;\;
+\hat X_{T+h\vert T}+q_{1-\frac \alpha 2}\hat{\sigma}_h
+\right]
+$$
+
+
+Avec $(Ho) \: \hat\theta_1 = \theta_1$, $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$ 
+
+En effet, les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient  l'équation :
 $$
 \begin{cases}
-\hat X_{T+1\vert T}=X_T - \hat\theta_1\varepsilon_T \\
+\hat X_{T+1\vert T}=X_T + \hat\theta_1\varepsilon_T \\
 \hat X_{T+2\vert T}=\hat X_{T+1\vert T}
 \end{cases}
 $$
-Les erreurs de prévision sont égales à :
+Les erreurs de prévision sont alors égales à :
 $$
 \begin{cases}
 \hat \varepsilon_{T+1\vert T} = X_{T+1} - \hat X_{T+1\vert T}=
@@ -187,16 +211,16 @@ $$
 \hat \varepsilon_{T+2\vert T} = X_{T+2} - \hat X_{T+2\vert T}=
 \varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}+(\theta_1-\hat\theta_1)\varepsilon_T 
 \end{cases}
+\iff 
+\begin{cases}
+\hat \varepsilon_{T+1\vert T}  \sim \mathcal N(0,{\sigma_1}^2)\text{ avec } \sigma_1^2=\sigma^2
+\\
+\hat \varepsilon_{T+2\vert T} \sim \mathcal N(0,{\sigma_2}^2) \text{ avec } \sigma_2^2 = {\sigma}^2 (1+\theta_1)^2
+\end{cases}
 $$
-Les intervalles de confiance de niveau $\alpha$ sur $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$ s'écrivent donc :
-$$
-IC_{1-\alpha}(\hat X_{T+h\vert T}) =
-\left[
-\hat X_{T+h\vert T}-q_{1-\frac \alpha 2}\hat{\sigma}_h\;;\;
-\hat X_{T+h\vert T}+q_{1-\frac \alpha 2}\hat{\sigma}_h
-\right]
-$$
-Avec $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$ et :
+
+On a alors : 
+
 $$
 \hat \sigma_1 = \hat\sigma\text{,}\quad
 \hat\sigma_2=\hat\sigma\sqrt{1+(1+\hat \theta_1)^2}\quad\text{et}
@@ -204,6 +228,7 @@ $$
 \hat\sigma = \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
 $$
 (la somme commence à 2 puisque l'on perd une période en différenciant) 
+
 
 Bilan :
 \begin{equation}
@@ -276,6 +301,13 @@ format_testlb(models_evalues,
             titre = "Tests de Ljung-Box sur les résidus (tests d'autocorrélation) des modèles ARIMA sur l'IPI de l'automobile")
 ```
 
+
+
+```{r tabcoefs}
+format_tab_coef(models_evalues, 
+            titre = "Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile")
+```
+
 ```{r tablb2test}
 format_testlb(models_evalues, 
             var = "lb2test",
@@ -292,10 +324,4 @@ format_jbtest(models_evalues,
 		# footnote(footnote_order= c("symbol","general"), #marche pas
 		# 		 symbol = "\n\nL’hypothèse (H0) de normalité des résidus n’est pas rejetée à 5 % pour l’ensemble des modèles\net en particulier pour le modèle retenu ARIMA(0,1,1).",
 		# 		 symbol_manual = c(''))
-```
-
-
-```{r tabcoefs}
-format_tab_coef(models_evalues, 
-            titre = "Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile")
 ```
