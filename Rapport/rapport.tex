@@ -35,7 +35,6 @@
             pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
             colorlinks=true,
             linkcolor=Maroon,
-            filecolor=Maroon,
             citecolor=Blue,
             urlcolor=blue,
             breaklinks=true}
@@ -72,8 +71,30 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
 \usepackage{fontawesome}
 \usepackage{multicol}
+% https://github.com/rstudio/rmarkdown/issues/337
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+% https://github.com/rstudio/rmarkdown/pull/252
+\usepackage{titling}
+\setlength{\droptitle}{-2em}
+
+\pretitle{\vspace{\droptitle}\centering\huge}
+\posttitle{\par}
+
+\preauthor{\centering\large\emph}
+\postauthor{\par}
+
+\predate{\centering\large\emph}
+\postdate{\par}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -323,8 +344,8 @@ IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 \\ \hat X_{T+2\vert T}\end{pmatrix}\right) =
 \left[
   \begin{pmatrix} 
-    X_T - \hat\theta_1\varepsilon_T 
-    \\ X_T - \hat\theta_1\varepsilon_T 
+    X_T + \hat\theta_1\varepsilon_T 
+    \\ X_T + \hat\theta_1\varepsilon_T 
   \end{pmatrix}
   -
   \hat\sigma q_{1-\frac \alpha 2}
@@ -347,7 +368,7 @@ IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 \label{eq:icPrev}
 \end{equation}
 
-Pour obtenir ces intervalles de confiance il faut que \(T\) grand (dans notre cas \(T=120\)) et que les résidus de notre modèle ARIMA soient indépendants, homoscédastiques et suivent une loi normale : ce qui est bien vérifié dans notre cas.
+Pour obtenir ces intervalles de confiance il faut que \(T\) grand (dans notre cas \(T=120\)) et que les résidus de notre modèle ARIMA soient \textbf{indépendants, homoscédastiques et suivent une loi normale} : ce qui a bien été vérifié dans la partie précédente.
 
 \begin{figure}
 
@@ -358,16 +379,16 @@ Pour obtenir ces intervalles de confiance il faut que \(T\) grand (dans notre ca
 \caption{Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:prevIpi}
 \end{figure}
 
-Le graphique \ref{fig:prevIpi} montre cette région de confiance au seuil 95 \%, ainsi que les valeurs actuelles de l'IPI automobile de janvier et de février 2020.
-On retrouve ce que l'on a montré par l'équation \eqref{eq:icPrev} : on prévoit la même valeur en \(X_{T+1}\) et \(X_{T+2}\) et plus l'horizon augmente plus l'incertitude autour de la prévision (i.e : l'intervalle de confiance) augmente.
-Cela parait peu cohérent économiquement de garder la même prévision pour les deux dates mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
+Le graphique \ref{fig:prevIpi} montre cette région de confiance au seuil 95 \%, ainsi qu'à titre de comparaison les valeurs réelles de l'IPI automobile de janvier et de février 2020.
+On retrouve ce que l'on a montré par l'équation \eqref{eq:icPrev} : la même valeur est prédite pour \(X_{T+1}\) et \(X_{T+2}\) et plus l'horizon augmente plus l'incertitude autour de la prévision augmente (i.e : l'intervalle de confiance est large).
+Prédire les mêmes valeurs pour les deux dates paraît économiquement peu cohérent, mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
 
 \begin{itemize}
 \item
   Puisqu'il y a aucun ordre autorégressif, \(\Delta X_t\) ne dépend pas des valeurs passées prises par \((\Delta X_{t'})_{t'\leq t-1}\).
 \item
-  Puisque l'ordre MA est égale à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour \(\Delta X_{t+h}\), \(h\geq 2\), est une prévision nulle, et donc pour \(X_{t+h}\) la seule prévision possible est \(\hat X_{t+1\vert t}\).
-  Cette incertitude se traduit par un intervalle de confiance très grand\footnote{On prévoit une évolution mensuelle entre janvier 2020 et décembre 2019 comprise entre -7,3 \% et +7,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1, sa moyenne de 0,1).} et une rapide augmentation de cet intervalle.
+  Puisque l'ordre MA est égal à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour \(\Delta X_{t+h}\), \(h\geq 2\), est une prévision nulle, et donc pour \(X_{t+h}\) la seule prévision possible est \(\hat X_{t+1\vert t}\).
+  Cette incertitude se traduit par un intervalle de confiance très grand\footnote{On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,4 \% et +8,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).} et une rapide augmentation de cet intervalle.
 \end{itemize}
 
 \hypertarget{question-9-question-ouverte-sur-la-causalituxe9}{%

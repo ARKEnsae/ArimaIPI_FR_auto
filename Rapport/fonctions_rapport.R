@@ -255,16 +255,31 @@ graph_prev <- function(x, x_complet, prev, n_xlabel = 12){
 				  linetype = "longdash", aes(color = "prev"))+
 		scale_x_continuous(breaks = scales::pretty_breaks(n = n_xlabel),
 						   labels = function(x) AQLTools:::creation_x_label(x, x_lab_month = TRUE))+
-		AQLTools:::theme_aqltools() +
+
+		theme_grey(base_size = 11, base_family = "") %+replace% 
+		theme(panel.background = element_rect(fill = "white", 
+											  colour = NA),
+			  panel.border = element_rect(fill = NA, colour = "grey20"),
+			  panel.grid.major = element_line(colour = "grey92"), 
+			  panel.grid.minor = element_line(colour = "grey92", 
+			  								size = 0.25),
+			  strip.background = element_rect(fill = "grey85",   colour = "grey20"),
+			  complete = TRUE,
+			  plot.title = element_text(hjust = 0.5), 
+			  #legend.background = element_rect(fill = alpha("gray99", 0.4),colour = "gray80", linetype = "solid"), 
+			  legend.justification = "top",
+			  legend.position = "right",
+			  legend.key = element_blank(),
+			  legend.title = element_blank()) +
 		labs(title = NULL,
 			 x = NULL, y = NULL)  +
 		scale_colour_manual(name = "Légende",
 							breaks = c("ipi", "ipireel", "prev"),
-							labels = c("IPI", "IPI observé", "IPI prévu ARIMA(0,1,1)"),
+							labels = c("IPI", "IPI observé", "IPI prévu\nARIMA(0,1,1)"),
 							values = c("black", "black", "red")) +
 		scale_fill_manual(name = "Légende",
 						  breaks = "ic",
-						  labels = c("IC(95%)"),
+						  labels = c("IC (95 %)"),
 						  values = c("black")) +
 		guides(color = guide_legend(keywidth = 2, keyheight = 1,
 									override.aes = list(shape = c(NA,19,19),

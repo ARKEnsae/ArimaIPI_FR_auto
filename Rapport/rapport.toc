@@ -5,5 +5,5 @@
 \contentsline {section}{\numberline {2}Partie 2 : Modèles ARIMA}{2}{section.2}%
 \contentsline {section}{\numberline {3}Partie 3 : Prévisions}{3}{section.3}%
 \contentsline {subsection}{\numberline {3.1}Question 6, 7 et 8 : construction d'un intervalle de confiance}{3}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Question 9 : question ouverte sur la causalité}{5}{subsection.3.2}%
-\contentsline {section}{\numberline {A}Annexe 1 : tests supplémentaires sur la qualité des modèles}{6}{appendix.A}%
+\contentsline {subsection}{\numberline {3.2}Question 9 : question ouverte sur la causalité}{4}{subsection.3.2}%
+\contentsline {section}{\numberline {A}Annexe 1 : tests supplémentaires sur la qualité des modèles}{5}{appendix.A}%
