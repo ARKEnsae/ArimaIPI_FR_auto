@@ -185,35 +185,31 @@ $$
 Les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient l'équation :
 $$
 \begin{cases}
-\hat X_{T+1\vert T}=X_T + \hat\theta_1\varepsilon_T \\
-\hat X_{T+2\vert T}=\hat X_{T+1\vert T}
+\hat X_{T+1\vert T}= X_T + \theta_1\varepsilon_T \\
+\hat X_{T+2\vert T}=\hat X_{T+1\vert T} =  X_T + \theta_1\varepsilon_T 
 \end{cases}
 $$
 Les erreurs de prévision sont égales à :
 $$
 \begin{cases}
 \hat \varepsilon_{T+1\vert T} = X_{T+1} - \hat X_{T+1\vert T}=
-\varepsilon_{T+1}+(\theta_1-\hat\theta_1)\varepsilon_T
+\varepsilon_{T+1}+(\theta_1-\theta_1)\varepsilon_T 
+&= \varepsilon_{T+1}
 \\
 \hat \varepsilon_{T+2\vert T} = X_{T+2} - \hat X_{T+2\vert T}=
-\varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}+(\theta_1-\hat\theta_1)\varepsilon_T 
+\varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}+(\theta_1-\theta_1)\varepsilon_T 
+&=
+\varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}
 \end{cases}
 $$
-La construction d'un intervalle confiance de niveau $\alpha$ de $X_{T+h\vert T}$ pour $h \in \{1,2\}$ se base sur le test :
+Les $\varepsilon_t$ étant i.i.d., $\hat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)$ avec $\sigma_1^2=\sigma^2$ et $\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)$. En notant $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$, il vient pour $h\in\{1,2\}$ :
 $$
-\begin{cases}
-(H_0)\::\:&\hat \theta_1 = \theta_1 \\
-(H_1)\::\:&\hat \theta_1 \ne \theta_1 
-\end{cases}
-$$
-Les $\varepsilon_t$ étant i.i.d., sous $(H_0)$ on a $\hat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)$ avec $\sigma_1^2=\sigma^2$ et $\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)$. En notant $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$, il vient :
-$$
-\mathbb P_{(H_0)}\left(
+\mathbb P\left(
 \left\lvert
 \frac{\hat \varepsilon_{T+h\vert T}}{\sigma_h}
 \right\rvert\leq q_{1-\frac{\alpha}{2}}
 \right)=
-\mathbb P_{(H_0)}\left(
+\mathbb P\left(
 \left\lvert
 \frac{X_{T+h} - \hat X_{T+h\vert T}}{\sigma_h}
 \right\rvert\leq q_{1-\frac{\alpha}{2}}
@@ -223,24 +219,29 @@ $$
 Un intervalle de confiance de $X_{T+h}$ de niveau $\alpha$ est donc :
 \begin{equation}
 IC_{1-\alpha}(X_{T+h}) = \left[
-\hat X_{T+h\vert T}-q_{1-\frac \alpha 2}{\sigma}_h\;;\;
-\hat X_{T+h\vert T}+q_{1-\frac \alpha 2}{\sigma}_h
+X_T+\hat \theta_1\varepsilon_T -q_{1-\frac \alpha 2}{\sigma}_h\;;\;
+X_T+\hat \theta_1\varepsilon_T +q_{1-\frac \alpha 2}{\sigma}_h
 \right]
 (\#eq:icCourtTerme)
 \end{equation}
-Le problème est que $\sigma_h$ est inconnu, on l'estime donc par $\hat \sigma_h$ avec :
+Le problème est que $\sigma_h$ et $\theta_1$ sont inconnus. Si $\theta_1$ est connu on peut estimer $\sigma_h$ par $\tilde \sigma_h$ avec :
 $$
-\hat\sigma_1 = \hat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
+\tilde\sigma_1 = \tilde\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
+\text{ et }\quad
+\tilde\sigma_2=\hat\sigma\sqrt{1+(1+ \theta_1)^2}
+$$
+L'intervalle de confiance \@ref(eq:icCourtTerme) reste valide en remplaçant $\sigma_h$ par $\tilde \sigma_h$ et $q_{1-\frac \alpha 2}$ par le quantile $1-\frac \alpha 2$ d'une loi de Student de degré $T-2$. Dans notre cas, puisque $\theta_1$ n'est pas connu on le remplace dans les formules précédentes par $\hat \theta_1$, qui est l'estimation que l'on fait à partir de nos données. On estime donc $\sigma_h$ par $\hat \sigma_h$ avec :
+$$
+\hat\sigma_1 = \hat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2=
+\tilde \sigma 
 \text{ et }\quad
 \hat\sigma_2=\hat\sigma\sqrt{1+(1+\hat \theta_1)^2}
 $$
-En remplaçant $\sigma_h$ par $\hat\sigma_h$, les intervalles de confiance définis dans l'équation \@ref(eq:icCourtTerme) restent valides mais **asymptotiquement uniquement**^[
-Du fait de la forme simple de notre modèle ARIMA(0,1,1), on pourrait calculer un intervalle de confiance à court terme de $X_{T+1}$ en remplaçant $q_{1-\frac\alpha 2}$ par le quantile $1-\frac\alpha 2$ d'une loi de Student de degré $T-2$. Ce n'est cependant par possible pour $X_{T+2}$ et pour des modèles plus compliqués. 
-], grâce au théorème de Slutsky (les estimateurs précédents des variances étant fortement consistants). 
+En remplaçant $\sigma_h$ par $\hat\sigma_h$, $\theta_1$ par $\theta_2$, les intervalles de confiance définis dans l'équation \@ref(eq:icCourtTerme) restent valides mais **asymptotiquement uniquement**. 
 En somme, on obtient les estimateurs suivants pour $X_{T+1}$ et $X_{T+2}$ :
 \begin{equation}
-IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
-\\ \hat X_{T+2\vert T}\end{pmatrix}\right) =
+IC_{1-\alpha}\begin{pmatrix} X_{T+1}
+\\ X_{T+2}\end{pmatrix} =
 \left[
   \begin{pmatrix} 
     X_T + \hat\theta_1\varepsilon_T 
@@ -267,7 +268,12 @@ IC_{1-\alpha}\left(\begin{pmatrix} \hat X_{T+1\vert T}
 (\#eq:icPrev)
 \end{equation}
 
-Pour obtenir ces intervalles de confiance il faut que $T$ grand (dans notre cas $T=120$) et que les résidus de notre modèle ARIMA soient **indépendants, homoscédastiques et suivent une loi normale** : ce qui a bien été vérifié dans la partie précédente. 
+Pour obtenir ces intervalles de confiance il faut :
+
+- que les résidus de notre modèle ARIMA soient **indépendants, homoscédastiques et suivent une loi normale** : ce qui a bien été vérifié dans la partie précédente ;  
+- que soit $T$ grand (dans notre cas $T=120$) ;  
+- que le modèle suivit par notre série entre janvier 2010 et février 2020 soit bien un modèle ARIMA(0,1,1).
+
 
 ```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)"}
 ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
