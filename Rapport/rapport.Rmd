@@ -47,7 +47,7 @@ source("fonctions_rapport.R",encoding = "UTF-8")
 ## Question 1 : description de la série choisie
 
 Pour ce projet, travaillons sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940). 
-Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2), poste CL1.
+Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2, division 29), poste CL1.
 L'industrie automobile concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d’aménagement de véhicules automobiles. 
 Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu’ils sont principalement destinés à des véhicules automobiles (à l’exception des parties de moteur).
 
@@ -173,7 +173,7 @@ format_ic(models_evalues,
 ## Question 6, 7 et 8 : construction d'un intervalle de confiance
 
 On cherche désormais à faire une prévision de $X_t$ à l'horizon $T+2$. 
-Notons $\theta_1$ le coefficient associé à la partie MA de notre modèle ARMA(0,1,1), qu'on estime par $\hat\theta_1\simeq -0,38$ en estimant le modèle entre janvier 2010 et décembre 2019. On a donc :
+Notons $\theta_1$ le coefficient associé à la partie MA de notre modèle ARMA(0,1,1), qu'on estime par $\hat\theta_1\simeq -0,38$  (tableau \@ref(tab:tabcoefs)) en estimant le modèle entre janvier 2010 et décembre 2019. On a donc :
 $$
 \Delta X_T = \varepsilon_T + \theta_1\varepsilon_{T-1}
 \iff 
@@ -182,7 +182,7 @@ X_T = X_{T-1} + \varepsilon_T + \theta_1\varepsilon_{T-1}
 \varepsilon_t\overset{i.i.d}\sim\mathcal N(0,\sigma^2)
 $$
 
-Les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient l'équation :
+En considérant $\theta_1$ connu, les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient l'équation :
 $$
 \begin{cases}
 \hat X_{T+1\vert T}= X_T + \theta_1\varepsilon_T \\
@@ -219,26 +219,31 @@ $$
 Un intervalle de confiance de $X_{T+h}$ de niveau $\alpha$ est donc :
 \begin{equation}
 IC_{1-\alpha}(X_{T+h}) = \left[
-X_T+\hat \theta_1\varepsilon_T -q_{1-\frac \alpha 2}{\sigma}_h\;;\;
-X_T+\hat \theta_1\varepsilon_T +q_{1-\frac \alpha 2}{\sigma}_h
+X_T+ \theta_1\varepsilon_T -q_{1-\frac \alpha 2}{\sigma}_h\;;\;
+X_T+ \theta_1\varepsilon_T +q_{1-\frac \alpha 2}{\sigma}_h
 \right]
 (\#eq:icCourtTerme)
 \end{equation}
-Le problème est que $\sigma_h$ et $\theta_1$ sont inconnus. Si $\theta_1$ est connu on peut estimer $\sigma_h$ par $\tilde \sigma_h$ avec :
+
+<!-- Si $\theta_1$ est connu on peut estimer $\sigma_h$ par $\tilde \sigma_h$ avec : -->
+<!-- $$ -->
+<!-- \tilde\sigma_1 = \tilde\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2 -->
+<!-- \text{ et }\quad -->
+<!-- \tilde\sigma_2=\hat\sigma\sqrt{1+(1+ \theta_1)^2} -->
+<!-- $$ -->
+
+<!-- L'intervalle de confiance \@ref(eq:icCourtTerme) reste valide en remplaçant $\sigma_h$ par $\tilde \sigma_h$ et $q_{1-\frac \alpha 2}$ par le quantile $1-\frac \alpha 2$ d'une loi de Student de degré $T-2$.  -->
+
+Le problème est que $\sigma_h$ et $\theta_1$ sont ici inconnus.
+On estime donc $\theta_1$ par $\hat \theta_1$, qui est l'estimation que l'on fait à partir de nos données et $\sigma_h$ par $\hat \sigma_h$ telle que :
 $$
-\tilde\sigma_1 = \tilde\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
-\text{ et }\quad
-\tilde\sigma_2=\hat\sigma\sqrt{1+(1+ \theta_1)^2}
-$$
-L'intervalle de confiance \@ref(eq:icCourtTerme) reste valide en remplaçant $\sigma_h$ par $\tilde \sigma_h$ et $q_{1-\frac \alpha 2}$ par le quantile $1-\frac \alpha 2$ d'une loi de Student de degré $T-2$. Dans notre cas, puisque $\theta_1$ n'est pas connu on le remplace dans les formules précédentes par $\hat \theta_1$, qui est l'estimation que l'on fait à partir de nos données. On estime donc $\sigma_h$ par $\hat \sigma_h$ avec :
-$$
-\hat\sigma_1 = \hat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2=
-\tilde \sigma 
+\hat\sigma_1 = \hat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
 \text{ et }\quad
 \hat\sigma_2=\hat\sigma\sqrt{1+(1+\hat \theta_1)^2}
 $$
-En remplaçant $\sigma_h$ par $\hat\sigma_h$, $\theta_1$ par $\theta_2$, les intervalles de confiance définis dans l'équation \@ref(eq:icCourtTerme) restent valides mais **asymptotiquement uniquement**. 
-En somme, on obtient les estimateurs suivants pour $X_{T+1}$ et $X_{T+2}$ :
+En remplaçant $\sigma_h$ et $\theta_1$ par leurs valeurs estimées, les intervalles de confiance définis dans l'équation \@ref(eq:icCourtTerme) restent valides mais **asymptotiquement uniquement**. 
+
+[*Question 6*] En somme, on obtient les intervalles de confiance asymptotiques suivants pour $X_{T+1}$ et $X_{T+2}$ :
 \begin{equation}
 IC_{1-\alpha}\begin{pmatrix} X_{T+1}
 \\ X_{T+2}\end{pmatrix} =
@@ -268,12 +273,11 @@ IC_{1-\alpha}\begin{pmatrix} X_{T+1}
 (\#eq:icPrev)
 \end{equation}
 
-Pour obtenir ces intervalles de confiance il faut :
+[*Question 7*] Pour obtenir ces intervalles de confiance il faut :
 
+- que le modèle suivit par notre série entre janvier 2010 et février 2020 soit bien un modèle ARIMA(0,1,1). Le modèle doit être en théorie parfaitement identifié ($\sigma$ et $\theta_1$ connus ou a minima que leurs estimateurs convergent vers leurs valeurs). ;
 - que les résidus de notre modèle ARIMA soient **indépendants, homoscédastiques et suivent une loi normale** : ce qui a bien été vérifié dans la partie précédente ;  
-- que soit $T$ grand (dans notre cas $T=120$) ;  
-- que le modèle suivit par notre série entre janvier 2010 et février 2020 soit bien un modèle ARIMA(0,1,1).
-
+- que soit $T$ grand (dans notre cas $T=120$).  
 
 ```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)"}
 ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
@@ -284,7 +288,7 @@ graph_prev(x, x_complet, prev, n_xlabel = 12)
 ```
 
 
-Le graphique \@ref(fig:prevIpi) montre cette région de confiance au seuil 95 \%, ainsi qu'à titre de comparaison les valeurs réelles de l'IPI automobile de janvier et de février 2020. 
+[*Question 8*] Le graphique \@ref(fig:prevIpi) montre cette région de confiance au seuil 95 \%, ainsi qu'à titre de comparaison les valeurs réelles de l'IPI automobile de janvier et de février 2020. 
 On retrouve ce que l'on a montré par l'équation \@ref(eq:icPrev) : la même valeur est prédite pour $X_{T+1}$ et $X_{T+2}$ et plus l'horizon augmente plus l'incertitude autour de la prévision augmente (i.e : l'intervalle de confiance est large). 
 Prédire les mêmes valeurs pour les deux dates paraît économiquement peu cohérent, mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
 
@@ -299,9 +303,35 @@ Cette incertitude se traduit par un intervalle de confiance très grand^[On pré
 
 ## Question 9 : question ouverte sur la causalité
 
-Granger
+
+Soit $Y_t$ une série stationnaire disponible de $t = 1$ à $T$ telle que $Y_{T+1}$ est disponible plus rapidement que $X_{T+1}$. 
+
+$Y_t$ cause^[Cette notion de causalité n'est pas la même que celle utilisée en économétrie classique (une influence directe de $Y_t$ sur $X_t$), cela signifie simplement ici que $Y_t$ est utile pour prévoir $X_t$.] instantanément $X_t$ au sens de Granger ($C_{X - Y}$^[La relation de causalité instantanée de Granger est symétrique : $C_{X - Y} \iff C_{Y - X}$]) si et seulement si pour tout $t$, la valeur de $Y_{t+1}$ permet d'améliorer la prévision de $X_{t+1}$. Ainsi, la causalité instantanée au sens de Granger est une condition suffisante pour que $Y_{T+1}$ permette d'améliorer la prévision de $X_{T+1}$. Mathématiquement : 
+
+$$ \underbrace{\forall t \quad \hat X_{t+1 \vert \{Y_u, X_u, u \le t \}  \cup \{Y_{t+1}\}}   \ne \hat X_{t+1 \vert \{Y_u, X_u, u \le t \}}}_{C_{X - Y} \text{ }:\text{ } Y_t \textrm{ cause instantanément au sens de Granger } X_t} \overset{\text{en particulier}}{\Longrightarrow} \hat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T}\} \cup \{Y_{T+1}\}} \ne \hat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T}\}}$$
+
+
+<!-- c'est-à-dire que la prédiction de $X_t$ à la date $T+1$ ($X_{t+1}$) sachant toutes les valeurs passées de $X_t$ et $Y_t$ ainsi que la valeur $Y_{T+1}$ est différente de celle où on ne connaîtrait pas la valeur de $Y_{T+1}$   -->
+
+<!-- l’erreur quadratique moyenne de prédiction de $X_{T+1}$ est inférieure à celle calculée sans utiliser $Y_t$. -->
+
+Cette définition de causalité instantanée est fondée sur les corrélations entre les erreurs. En effet, si $(Y_t',X_t')'$ est bien **stationnaire** alors on a montré dans le cours que : 
+
+$$C_{X - Y} \iff Cov(\epsilon_{1t},\epsilon_{2t}) = 0 \quad \text{avec} \quad \begin{pmatrix} \epsilon_{1t}
+\\\epsilon_{2t}\end{pmatrix} = \begin{pmatrix} Y_t - \hat Y_{t \vert \{Y_u, X_u, u \le t-1 \}}
+\\\ X_t - \hat X_{t \vert \{Y_u, X_u, u \le t-1 \}}\end{pmatrix}$$
+ 
+
+En prenant bien le soin de choisir $X_t$ et $Y_t$ de manière à ce que $(Y_t',X_t')'$ soit stationnaire, vérifier que $Y_{T+1}$ permet d'améliorer la prévision de $X_{T+1}$ revient alors à tester la condition suivante après avoir estimé les modèles correspondants à l'évolution de $X_t$ et $Y_t$ : 
+ 
+$$Cov( Y_{T+1} - \hat Y_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }, X_{T+1} - \hat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }) = 0$$
+Il faudrait par exemple prendre :
+
+- pour $X_t$ notre série de l'IPI de l'industrie automobile différenciée (qui est bien stationnaire) ;
+- pour $Y_t$ un IPI correspondant à une composante de la division « industrie automobile » (29)^[par exemple une des classes parmi la construction de véhicules automobiles (29.1), la fabrication de carrosseries et remorques (29.2) ou les équipements automobiles (29.3)] qu'il faudrait différencier autant de fois que nécessaire pour qu'elle soit bien stationnaire. Certaines composantes sont en effet disponibles avant leur agrégat, ce qui les feraient être de bons candidats pour cette question.
 
 \newpage
+
 
 # (APPENDIX) Appendix {-}
 
