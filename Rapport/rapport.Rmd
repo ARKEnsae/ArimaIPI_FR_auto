@@ -173,7 +173,7 @@ format_ic(models_evalues,
 ## Question 6, 7 et 8 : construction d'un intervalle de confiance
 
 On cherche désormais à faire une prévision de $X_t$ à l'horizon $T+2$. 
-Notons $\theta_1$ le coefficient associé à la partie MA de notre modèle ARMA(0,1,1), qu'on estime par $\hat\theta_1\simeq -0,38$  (tableau \@ref(tab:tabcoefs)) en estimant le modèle entre janvier 2010 et décembre 2019. On a donc :
+Notons $\theta_1$ le coefficient associé à la partie MA de notre modèle ARMA(0,1,1), qu'on estime par $\widehat\theta_1\simeq -0,38$  (tableau \@ref(tab:tabcoefs)) en estimant le modèle entre janvier 2010 et décembre 2019. On a donc :
 $$
 \Delta X_T = \varepsilon_T + \theta_1\varepsilon_{T-1}
 \iff 
@@ -182,36 +182,36 @@ X_T = X_{T-1} + \varepsilon_T + \theta_1\varepsilon_{T-1}
 \varepsilon_t\overset{i.i.d}\sim\mathcal N(0,\sigma^2)
 $$
 
-En considérant $\theta_1$ connu, les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\hat X_{T+1\vert T}$ et $\hat X_{T+2\vert T}$, vérifient l'équation :
+En considérant $\theta_1$ connu, les prévisions de $X_{T+1}$ et $X_{T+2}$ réalisées à l'instant $T$, notées $\widehat X_{T+1\vert T}$ et $\widehat X_{T+2\vert T}$, vérifient l'équation :
 $$
 \begin{cases}
-\hat X_{T+1\vert T}= X_T + \theta_1\varepsilon_T \\
-\hat X_{T+2\vert T}=\hat X_{T+1\vert T} =  X_T + \theta_1\varepsilon_T 
+\widehat X_{T+1\vert T}= X_T + \theta_1\varepsilon_T \\
+\widehat X_{T+2\vert T}=\widehat X_{T+1\vert T} =  X_T + \theta_1\varepsilon_T 
 \end{cases}
 $$
 Les erreurs de prévision sont égales à :
 $$
 \begin{cases}
-\hat \varepsilon_{T+1\vert T} = X_{T+1} - \hat X_{T+1\vert T}=
+\widehat \varepsilon_{T+1\vert T} = X_{T+1} - \widehat X_{T+1\vert T}=
 \varepsilon_{T+1}+(\theta_1-\theta_1)\varepsilon_T 
 &= \varepsilon_{T+1}
 \\
-\hat \varepsilon_{T+2\vert T} = X_{T+2} - \hat X_{T+2\vert T}=
+\widehat \varepsilon_{T+2\vert T} = X_{T+2} - \widehat X_{T+2\vert T}=
 \varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}+(\theta_1-\theta_1)\varepsilon_T 
 &=
 \varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}
 \end{cases}
 $$
-Les $\varepsilon_t$ étant i.i.d., $\hat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)$ avec $\sigma_1^2=\sigma^2$ et $\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)$. En notant $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$, il vient pour $h\in\{1,2\}$ :
+Les $\varepsilon_t$ étant i.i.d., $\widehat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)$ avec $\sigma_1^2=\sigma^2$ et $\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)$. En notant $q_{1-\frac \alpha 2}$ le quantile $1-\frac \alpha 2$ d'une loi $\mathcal N(0,1)$, il vient pour $h\in\{1,2\}$ :
 $$
 \mathbb P\left(
 \left\lvert
-\frac{\hat \varepsilon_{T+h\vert T}}{\sigma_h}
+\frac{\widehat \varepsilon_{T+h\vert T}}{\sigma_h}
 \right\rvert\leq q_{1-\frac{\alpha}{2}}
 \right)=
 \mathbb P\left(
 \left\lvert
-\frac{X_{T+h} - \hat X_{T+h\vert T}}{\sigma_h}
+\frac{X_{T+h} - \widehat X_{T+h\vert T}}{\sigma_h}
 \right\rvert\leq q_{1-\frac{\alpha}{2}}
 \right)=
 1-\alpha
@@ -225,21 +225,21 @@ X_T+ \theta_1\varepsilon_T +q_{1-\frac \alpha 2}{\sigma}_h
 (\#eq:icCourtTerme)
 \end{equation}
 
-<!-- Si $\theta_1$ est connu on peut estimer $\sigma_h$ par $\tilde \sigma_h$ avec : -->
+<!-- Si $\theta_1$ est connu on peut estimer $\sigma_h$ par $\widetilde \sigma_h$ avec : -->
 <!-- $$ -->
-<!-- \tilde\sigma_1 = \tilde\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2 -->
+<!-- \widetilde\sigma_1 = \widetilde\sigma=  \frac{1}{T-2}\sum_{t=2}^T\widehat\varepsilon_t^2 -->
 <!-- \text{ et }\quad -->
-<!-- \tilde\sigma_2=\hat\sigma\sqrt{1+(1+ \theta_1)^2} -->
+<!-- \widetilde\sigma_2=\widehat\sigma\sqrt{1+(1+ \theta_1)^2} -->
 <!-- $$ -->
 
-<!-- L'intervalle de confiance \@ref(eq:icCourtTerme) reste valide en remplaçant $\sigma_h$ par $\tilde \sigma_h$ et $q_{1-\frac \alpha 2}$ par le quantile $1-\frac \alpha 2$ d'une loi de Student de degré $T-2$.  -->
+<!-- L'intervalle de confiance \@ref(eq:icCourtTerme) reste valide en remplaçant $\sigma_h$ par $\widetilde \sigma_h$ et $q_{1-\frac \alpha 2}$ par le quantile $1-\frac \alpha 2$ d'une loi de Student de degré $T-2$.  -->
 
 Le problème est que $\sigma_h$ et $\theta_1$ sont ici inconnus.
-On estime donc $\theta_1$ par $\hat \theta_1$, qui est l'estimation que l'on fait à partir de nos données et $\sigma_h$ par $\hat \sigma_h$ telle que :
+On estime donc $\theta_1$ par $\widehat \theta_1$, qui est l'estimation que l'on fait à partir de nos données et $\sigma_h$ par $\widehat \sigma_h$ telle que :
 $$
-\hat\sigma_1 = \hat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\hat\varepsilon_t^2
+\widehat\sigma_1 = \widehat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\widehat\varepsilon_t^2
 \text{ et }\quad
-\hat\sigma_2=\hat\sigma\sqrt{1+(1+\hat \theta_1)^2}
+\widehat\sigma_2=\widehat\sigma\sqrt{1+(1+\widehat \theta_1)^2}
 $$
 En remplaçant $\sigma_h$ et $\theta_1$ par leurs valeurs estimées, les intervalles de confiance définis dans l'équation \@ref(eq:icCourtTerme) restent valides mais **asymptotiquement uniquement**. 
 
@@ -249,25 +249,25 @@ IC_{1-\alpha}\begin{pmatrix} X_{T+1}
 \\ X_{T+2}\end{pmatrix} =
 \left[
   \begin{pmatrix} 
-    X_T + \hat\theta_1\varepsilon_T 
-    \\ X_T + \hat\theta_1\varepsilon_T 
+    X_T + \widehat\theta_1\varepsilon_T 
+    \\ X_T + \widehat\theta_1\varepsilon_T 
   \end{pmatrix}
   -
-  \hat\sigma q_{1-\frac \alpha 2}
+  \widehat\sigma q_{1-\frac \alpha 2}
   \begin{pmatrix} 
     1\\
-    \sqrt{1+(1+\hat \theta_1)^2}
+    \sqrt{1+(1+\widehat \theta_1)^2}
   \end{pmatrix}
   \;;\;
   \begin{pmatrix} 
-    X_T - \hat\theta_1\varepsilon_T 
-    \\ X_T - \hat\theta_1\varepsilon_T 
+    X_T - \widehat\theta_1\varepsilon_T 
+    \\ X_T - \widehat\theta_1\varepsilon_T 
   \end{pmatrix}
   +
-  \hat\sigma q_{1-\frac \alpha 2}
+  \widehat\sigma q_{1-\frac \alpha 2}
   \begin{pmatrix} 
     1\\
-    \sqrt{1+(1+\hat \theta_1)^2}
+    \sqrt{1+(1+\widehat \theta_1)^2}
   \end{pmatrix}
 \right]
 (\#eq:icPrev)
@@ -294,7 +294,7 @@ Prédire les mêmes valeurs pour les deux dates paraît économiquement peu coh�
 
 - Puisqu'il y a aucun ordre autorégressif, $\Delta X_t$ ne dépend pas des valeurs passées prises par $(\Delta X_{t'})_{t'\leq t-1}$.
 
-- Puisque l'ordre MA est égal à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour $\Delta X_{t+h}$, $h\geq 2$, est une prévision nulle, et donc pour $X_{t+h}$ la seule prévision possible est $\hat X_{t+1\vert t}$. 
+- Puisque l'ordre MA est égal à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour $\Delta X_{t+h}$, $h\geq 2$, est une prévision nulle, et donc pour $X_{t+h}$ la seule prévision possible est $\widehat X_{t+1\vert t}$. 
 Cette incertitude se traduit par un intervalle de confiance très grand^[On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,4 \% et +8,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).
 ] et une rapide augmentation de cet intervalle.
 
@@ -308,7 +308,7 @@ Soit $Y_t$ une série stationnaire disponible de $t = 1$ à $T$ telle que $Y_{T+
 
 $Y_t$ cause^[Cette notion de causalité n'est pas la même que celle utilisée en économétrie classique (une influence directe de $Y_t$ sur $X_t$), cela signifie simplement ici que $Y_t$ est utile pour prévoir $X_t$.] instantanément $X_t$ au sens de Granger ($C_{X - Y}$^[La relation de causalité instantanée de Granger est symétrique : $C_{X - Y} \iff C_{Y - X}$]) si et seulement si pour tout $t$, la valeur de $Y_{t+1}$ permet d'améliorer la prévision de $X_{t+1}$. Ainsi, la causalité instantanée au sens de Granger est une condition suffisante pour que $Y_{T+1}$ permette d'améliorer la prévision de $X_{T+1}$. Mathématiquement : 
 
-$$ \underbrace{\forall t \quad \hat X_{t+1 \vert \{Y_u, X_u, u \le t \}  \cup \{Y_{t+1}\}}   \ne \hat X_{t+1 \vert \{Y_u, X_u, u \le t \}}}_{C_{X - Y} \text{ }:\text{ } Y_t \textrm{ cause instantanément au sens de Granger } X_t} \overset{\text{en particulier}}{\Longrightarrow} \hat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T}\} \cup \{Y_{T+1}\}} \ne \hat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T}\}}$$
+$$ \underbrace{\forall t \quad \widehat X_{t+1 \vert \{Y_u, X_u, u \le t \}  \cup \{Y_{t+1}\}}   \ne \widehat X_{t+1 \vert \{Y_u, X_u, u \le t \}}}_{C_{X - Y} \text{ }:\text{ } Y_t \textrm{ cause instantanément au sens de Granger } X_t} \overset{\text{en particulier}}{\Longrightarrow} \widehat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T}\} \cup \{Y_{T+1}\}} \ne \widehat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T}\}}$$
 
 
 <!-- c'est-à-dire que la prédiction de $X_t$ à la date $T+1$ ($X_{t+1}$) sachant toutes les valeurs passées de $X_t$ et $Y_t$ ainsi que la valeur $Y_{T+1}$ est différente de celle où on ne connaîtrait pas la valeur de $Y_{T+1}$   -->
@@ -318,13 +318,13 @@ $$ \underbrace{\forall t \quad \hat X_{t+1 \vert \{Y_u, X_u, u \le t \}  \cup \{
 Cette définition de causalité instantanée est fondée sur les corrélations entre les erreurs. En effet, si $(Y_t',X_t')'$ est bien **stationnaire** alors on a montré dans le cours que : 
 
 $$C_{X - Y} \iff Cov(\epsilon_{1t},\epsilon_{2t}) = 0 \quad \text{avec} \quad \begin{pmatrix} \epsilon_{1t}
-\\\epsilon_{2t}\end{pmatrix} = \begin{pmatrix} Y_t - \hat Y_{t \vert \{Y_u, X_u, u \le t-1 \}}
-\\\ X_t - \hat X_{t \vert \{Y_u, X_u, u \le t-1 \}}\end{pmatrix}$$
+\\\epsilon_{2t}\end{pmatrix} = \begin{pmatrix} Y_t - \widehat Y_{t \vert \{Y_u, X_u, u \le t-1 \}}
+\\\ X_t - \widehat X_{t \vert \{Y_u, X_u, u \le t-1 \}}\end{pmatrix}$$
  
 
 En prenant bien le soin de choisir $X_t$ et $Y_t$ de manière à ce que $(Y_t',X_t')'$ soit stationnaire, vérifier que $Y_{T+1}$ permet d'améliorer la prévision de $X_{T+1}$ revient alors à tester la condition suivante après avoir estimé les modèles correspondants à l'évolution de $X_t$ et $Y_t$ : 
  
-$$Cov( Y_{T+1} - \hat Y_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }, X_{T+1} - \hat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }) = 0$$
+$$Cov( Y_{T+1} - \widehat Y_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }, X_{T+1} - \widehat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }) = 0$$
 Il faudrait par exemple prendre :
 
 - pour $X_t$ notre série de l'IPI de l'industrie automobile différenciée (qui est bien stationnaire) ;
