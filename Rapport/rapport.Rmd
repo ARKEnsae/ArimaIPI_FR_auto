@@ -275,9 +275,9 @@ IC_{1-\alpha}\begin{pmatrix} X_{T+1}
 
 [*Question 7*] Pour obtenir ces intervalles de confiance il faut :
 
-- que le modèle suivit par notre série entre janvier 2010 et février 2020 soit bien un modèle ARIMA(0,1,1). Le modèle doit être en théorie parfaitement identifié ($\sigma$ et $\theta_1$ connus ou a minima que leurs estimateurs convergent vers leurs valeurs). ;
+- que le modèle suivit par notre série entre janvier 2010 et février 2020 soit bien un modèle ARIMA(0,1,1). Le modèle doit être en théorie parfaitement identifié ($\sigma$ et $\theta_1$ connus ou a minima que leurs estimateurs convergent vers leurs valeurs) ;
 - que les résidus de notre modèle ARIMA soient **indépendants, homoscédastiques et suivent une loi normale** : ce qui a bien été vérifié dans la partie précédente ;  
-- que soit $T$ grand (dans notre cas $T=120$).  
+- que $T$ soit grand (dans notre cas $T=120$).  
 
 ```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)"}
 ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
@@ -297,7 +297,6 @@ Prédire les mêmes valeurs pour les deux dates paraît économiquement peu coh�
 - Puisque l'ordre MA est égal à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour $\Delta X_{t+h}$, $h\geq 2$, est une prévision nulle, et donc pour $X_{t+h}$ la seule prévision possible est $\widehat X_{t+1\vert t}$. 
 Cette incertitude se traduit par un intervalle de confiance très grand^[On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,4 \% et +8,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).
 ] et une rapide augmentation de cet intervalle.
-
 
 
 
@@ -325,10 +324,20 @@ $$C_{X - Y} \iff Cov(\epsilon_{1t},\epsilon_{2t}) = 0 \quad \text{avec} \quad \b
 En prenant bien le soin de choisir $X_t$ et $Y_t$ de manière à ce que $(Y_t',X_t')'$ soit stationnaire, vérifier que $Y_{T+1}$ permet d'améliorer la prévision de $X_{T+1}$ revient alors à tester la condition suivante après avoir estimé les modèles correspondants à l'évolution de $X_t$ et $Y_t$ : 
  
 $$Cov( Y_{T+1} - \widehat Y_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }, X_{T+1} - \widehat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }) = 0$$
-Il faudrait par exemple prendre :
+En notant $X_t$ notre série de l'IPI de l'industrie automobile stationnarisée, il faudrait par exemple prendre pour $Y_t$ :
 
-- pour $X_t$ notre série de l'IPI de l'industrie automobile différenciée (qui est bien stationnaire) ;
-- pour $Y_t$ un IPI correspondant à une composante de la division « industrie automobile » (29)^[par exemple une des classes parmi la construction de véhicules automobiles (29.1), la fabrication de carrosseries et remorques (29.2) ou les équipements automobiles (29.3)] qu'il faudrait différencier autant de fois que nécessaire pour qu'elle soit bien stationnaire. Certaines composantes sont en effet disponibles avant leur agrégat, ce qui les feraient être de bons candidats pour cette question.
+- un IPI correspondant à une composante de la division « industrie automobile » (29)^[Par exemple une des classes parmi la construction de véhicules automobiles (29.1), la fabrication de carrosseries et remorques (29.2) ou les équipements automobiles (29.3)] qu'il faudrait différencier autant de fois que nécessaire pour qu'elle soit bien stationnaire. Certaines composantes peuvent en effet disponibles être avant leur agrégat, ce qui les feraient être de bons candidats pour cette question.
+
+- une série issue d'une autre enquête qui donnerait de l'information sur la production de l'IPI de l'industrie automobile. Cela peut par exemple être le cas des résultats des enquêtes de conjoncture, de l'Insee ou de la Banque de France, auprès des entreprises de ce secteur. Dans ces enquêtes on demande en effet l'opinion des chefs d'entreprise sur l'évolution passée et future de leur production : ces informations sont qualitatives et sont donc connues bien avant les informations quantitatives demandées par l'enquête mensuelle de branche. Ils sont donc de bons candidats pour prévoir l'évolution de l'IPI dans l'industrie automobile.
+
+Il peut également exister des cas où  $Y_{T+1}$ permet d'améliorer la prévision de $X_{T+1}$ mais sans que $Y_t$ cause instantanément $X_t$.  
+Prenons, par exemple, pour $X_T$ la série stationnarisée de l'indice de production industrielle dans la cokéfaction-raffinage. 
+Cette série est très bruitée car en France la production de ce poste est concentrée en une dizaine de raffineries. 
+Ainsi, il est très difficile d'avoir une prévision précise de cet série et elle sera très sensible à l'arrêt, durant quelques jours, d'au moins une raffinerie. 
+En revanche, si l'on a un indicateur $Y_t$ du nombre de jours de fermeture dans le mois, cette série, peut dans certains cas, permettre d'améliorer de manière conséquente la prévision de $X_t$. 
+C'est par exemple le cas pendant les périodes de grèves : l'analyse de l'évolution de la production pendant les grèves passées permet d'estimer l'effet moyen d'un jour de grève, et cela permet donc d'estimer l'évolution future de la production pendant les mouvements sociaux futurs.  
+Si en $T+1$ il y a des grèves dans les raffineries, $Y_{T+1}$ est connu bien avant $X_{T+1}$ et permet d'améliorer la prévision de $X_{T+1}$.  
+Puisqu'en général il n'y a pas de fermeture des raffineries (elles sont ouvertes tous les jours de la semaine), dans la majorité des cas $Y_t$ ne permet pas d'améliorer la prévision de $X_t$ : elle ne cause donc pas instantanément $X_t$ au sens de Granger.
 
 \newpage
 
