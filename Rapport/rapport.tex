@@ -35,7 +35,6 @@
             pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
             colorlinks=true,
             linkcolor=Maroon,
-            filecolor=Maroon,
             citecolor=Blue,
             urlcolor=blue,
             breaklinks=true}
@@ -72,8 +71,30 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
 \usepackage{fontawesome}
 \usepackage{multicol}
+% https://github.com/rstudio/rmarkdown/issues/337
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+% https://github.com/rstudio/rmarkdown/pull/252
+\usepackage{titling}
+\setlength{\droptitle}{-2em}
+
+\pretitle{\vspace{\droptitle}\centering\huge}
+\posttitle{\par}
+
+\preauthor{\centering\large\emph}
+\postauthor{\par}
+
+\predate{\centering\large\emph}
+\postdate{\par}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -397,23 +418,23 @@ Cette définition de causalité instantanée est fondée sur les corrélations e
 En prenant bien le soin de choisir \(X_t\) et \(Y_t\) de manière à ce que \((Y_t',X_t')'\) soit stationnaire, vérifier que \(Y_{T+1}\) permet d'améliorer la prévision de \(X_{T+1}\) revient alors à tester la condition suivante après avoir estimé les modèles correspondants à l'évolution de \(X_t\) et \(Y_t\) :
 
 \[Cov( Y_{T+1} - \widehat Y_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }, X_{T+1} - \widehat X_{T+1 \vert \{Y_{1 \dots T},X_{1 \dots T} \} }) = 0\]
-En notant \(X_t\) notre série de l'IPI de l'industrie automobile stationnarisée, il faudrait par exemple prendre pour \(Y_t\) :
+En notant \(X_t\) notre série de l'IPI de l'industrie automobile stationnarisée, il faudrait par exemple prendre pour \(Y_t\) des données susceptibles d'être disponibles avant \(X_t\) et feraient de bons candidats pour prévoir l'évolution de l'IPI dans l'industrie automobile :
 
 \begin{itemize}
 \item
-  un IPI correspondant à une composante de la division « industrie automobile » (29)\footnote{Par exemple une des classes parmi la construction de véhicules automobiles (29.1), la fabrication de carrosseries et remorques (29.2) ou les équipements automobiles (29.3)} qu'il faudrait différencier autant de fois que nécessaire pour qu'elle soit bien stationnaire. Certaines composantes peuvent en effet disponibles être avant leur agrégat, ce qui les feraient être de bons candidats pour cette question.
+  un IPI correspondant à une composante de la division « industrie automobile » (29)\footnote{Par exemple une des classes parmi la construction de véhicules automobiles (29.1), la fabrication de carrosseries et remorques (29.2) ou les équipements automobiles (29.3)} qu'il faudrait différencier autant de fois que nécessaire pour qu'elle soit bien stationnaire. Certaines composantes peuvent en effet disponibles être avant leur agrégat.
 \item
-  une série issue d'une autre enquête qui donnerait de l'information sur la production de l'IPI de l'industrie automobile. Cela peut par exemple être le cas des résultats des enquêtes de conjoncture, de l'Insee ou de la Banque de France, auprès des entreprises de ce secteur. Dans ces enquêtes on demande en effet l'opinion des chefs d'entreprise sur l'évolution passée et future de leur production : ces informations sont qualitatives et sont donc connues bien avant les informations quantitatives demandées par l'enquête mensuelle de branche. Ils sont donc de bons candidats pour prévoir l'évolution de l'IPI dans l'industrie automobile.
+  une série stationnaire issue d'une autre enquête qui donnerait de l'information sur la production de l'IPI de l'industrie automobile. Cela peut par exemple être le cas des résultats des enquêtes de conjoncture, de l'Insee ou de la Banque de France, auprès des entreprises de ce secteur. Dans ces enquêtes on demande en effet l'opinion des chefs d'entreprise sur l'évolution passée et future de leur production : ces informations sont qualitatives et sont donc connues bien avant les informations quantitatives demandées par l'enquête mensuelle de branche.
 \end{itemize}
 
 Il peut également exister des cas où \(Y_{T+1}\) permet d'améliorer la prévision de \(X_{T+1}\) mais sans que \(Y_t\) cause instantanément \(X_t\).\\
 Prenons, par exemple, pour \(X_T\) la série stationnarisée de l'indice de production industrielle dans la cokéfaction-raffinage.
 Cette série est très bruitée car en France la production de ce poste est concentrée en une dizaine de raffineries.
-Ainsi, il est très difficile d'avoir une prévision précise de cet série et elle sera très sensible à l'arrêt, durant quelques jours, d'au moins une raffinerie.
-En revanche, si l'on a un indicateur \(Y_t\) du nombre de jours de fermeture dans le mois, cette série, peut dans certains cas, permettre d'améliorer de manière conséquente la prévision de \(X_t\).
+Ainsi, il est très difficile d'avoir une prévision précise de cette série qui sera très sensible, par exemple, à l'arrêt d'une raffinerie pendant quelques jours.
+En revanche, si on dispose d'un indicateur \(Y_t\) du nombre de jours de fermeture dans le mois, cette série peut, dans certains cas, permettre d'améliorer de manière conséquente la prévision de \(X_t\).
 C'est par exemple le cas pendant les périodes de grèves : l'analyse de l'évolution de la production pendant les grèves passées permet d'estimer l'effet moyen d'un jour de grève, et cela permet donc d'estimer l'évolution future de la production pendant les mouvements sociaux futurs.\\
 Si en \(T+1\) il y a des grèves dans les raffineries, \(Y_{T+1}\) est connu bien avant \(X_{T+1}\) et permet d'améliorer la prévision de \(X_{T+1}\).\\
-Puisqu'en général il n'y a pas de fermeture des raffineries (elles sont ouvertes tous les jours de la semaine), dans la majorité des cas \(Y_t\) ne permet pas d'améliorer la prévision de \(X_t\) : elle ne cause donc pas instantanément \(X_t\) au sens de Granger.
+Puisque les fermetures de raffineries sont rares (elles sont ouvertes tous les jours de la semaine), pour la majorité des périodes \(t\), \(Y_t\) ne permet pas d'améliorer la prévision de \(X_t\) : elle ne cause donc a priori pas instantanément \(X_t\) au sens de Granger.
 
 \newpage
 
