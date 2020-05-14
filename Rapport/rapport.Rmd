@@ -206,7 +206,8 @@ $$
 \varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}
 \end{cases}
 $$
-Les $\varepsilon_t$ étant i.i.d., $\widehat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)$ avec $\sigma_1^2=\sigma^2$ et $\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)$. De plus $\Cov(\widehat \varepsilon_{T+1\vert T},\widehat \varepsilon_{T+2\vert T})=\sigma^2(1+\theta_1)$. Donc :
+Les $\varepsilon_t$ étant i.i.d., $\widehat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)$ avec $\sigma_1^2=\sigma^2$ et $\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)$.
+De plus, $\Cov(\widehat \varepsilon_{T+1\vert T},\widehat \varepsilon_{T+2\vert T})=\sigma^2(1+\theta_1)$. Donc :
 $$
 \begin{pmatrix}
 	\widehat \varepsilon_{T+1\vert T} \\ \widehat \varepsilon_{T+2\vert T}
@@ -215,26 +216,15 @@ $$
 \begin{pmatrix}
 	0 \\ 0
 \end{pmatrix}\right.,
-\sigma^2 
 \underbrace{
+\sigma^2 
 \begin{pmatrix}
 	1 & 1+\theta_1\\ 1+\theta_1 & 1+ (1+\theta_1)^2
 \end{pmatrix}}_{\Sigma}\left.\mathclap{\phantom{\begin{pmatrix} 0\\0 \end{pmatrix}}}
 \right)
 $$
 D'où :
-$$\frac{1}{\sigma^2}\Sigma^{-1}
-\begin{pmatrix}
-	\widehat \varepsilon_{T+1\vert T} \\ \widehat \varepsilon_{T+2\vert T}
-\end{pmatrix} \sim
-\mathcal N \left(0_{\mathbb R^2}, I_2\right)\quad\text{avec}\quad
-\Sigma^{-1} = 
-\begin{pmatrix}
-	 1+(1+\theta_1)^2 & - (1+\theta_1) \\ -(1+\theta_1) &1
-\end{pmatrix}$$
-Et :
 $$
-\frac{1}{\sigma^2}
 \begin{pmatrix}
 	\widehat \varepsilon_{T+1\vert T} & \widehat \varepsilon_{T+2\vert T}
 \end{pmatrix}
@@ -242,8 +232,14 @@ $$
 \begin{pmatrix}
 	\widehat \varepsilon_{T+1\vert T} \\ \widehat \varepsilon_{T+2\vert T}
 \end{pmatrix}\sim{\chi}^2(2) 
+\quad\text{avec}\quad
+\Sigma^{-1} = 
+\frac{1}{\sigma^2}
+\begin{pmatrix}
+	 1+(1+\theta_1)^2 & - (1+\theta_1) \\ -(1+\theta_1) &1
+\end{pmatrix}
 $$
-En notant $q_{1- \alpha}$ le quantile $1- \alpha$ d'une loi ${\chi}^2(2)$, une région de confianc de niveau $\alpha$ pour $(X_{T+1},X_{T+2})$ est :
+En notant $q_{1- \alpha}$ le quantile $1- \alpha$ d'une loi ${\chi}^2(2)$, une région de confiance de niveau $\alpha$ pour $(X_{T+1},X_{T+2})$ est :
 \begin{equation}
 R_\alpha=\left\{ 
 \begin{pmatrix}
@@ -267,14 +263,7 @@ Le problème est que $\sigma_h$ et $\theta_1$ sont ici inconnus.
 On estime donc $\theta_1$ par $\widehat \theta_1$, qui est l'estimation que l'on fait à partir de nos données et $\sigma$ par $\widehat \sigma= \frac{1}{T-2}\sum_{t=2}^T\widehat\varepsilon_t^2$.
 En remplaçant $\sigma_h$ et $\theta_1$ par leurs valeurs estimées, la région de confiance définis dans l'équation \@ref(eq:icCourtTerme) reste valide mais **asymptotiquement uniquement**. 
 
-\begin{figure}[htbp]
-\begin{center}\includegraphics[width = 0.8\textwidth]{img/ellipse} \end{center}
-\captionsetup{margin=0cm,format=hang,justification=justified}
-\caption{Région de confiance pour la prévision de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:RegIC}
-\end{figure}
-
-
-[*Question 6*] En somme, la région de confiance pour $(X_{T+1},X_{T+2})$ est une ellipse, dont le centre est $(\widehat X_{T+1\vert T}, \widehat X_{T+2\vert T})$ et caractérisé par l'équation :
+[*Question 6*] En somme, la région de confiance pour $(X_{T+1},X_{T+2})$ est une ellipse, dont le centre est $(X_T + \widehat\theta_1\varepsilon_T, X_T + \widehat\theta_1\varepsilon_T)$ et caractérisé par l'équation :
 
 \begin{equation}
 \begin{split}
@@ -292,7 +281,7 @@ R_{1-\alpha}=\left\{
 (\#eq:icPrev)
 \end{equation}
 
-L'application numérique donne $\widehat X_{T+1\vert T}= \widehat X_{T+2\vert T}\simeq103,7$ et pour $\alpha = 0,05$ :
+L'application numérique ($\alpha = 0,05$, $\widehat\theta_1\simeq -0,38$, $X_T\simeq102,66$, $\varepsilon_T\simeq-2,63$, $\hat \sigma^2 \simeq 14,73$, $q_{0,95} \simeq 5,99$) donne :
 \begin{equation}
 R_{95\%}=\left\{ 
 \begin{pmatrix}
@@ -349,20 +338,26 @@ Prédire les mêmes valeurs pour les deux dates paraît économiquement peu coh�
 Cette incertitude se traduit par une région de confiance très large^[On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,8 \% et +8,7 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).
 ].
 
-La forme allongée de la région de confiance reflète une certaine cohérence entre les prévisions de $X_{T+1}$ et $X_{T+2}$ (que l'on a pas quand on construit des intervalles de confiance de manière indépendante). 
-En effet, plus  $\widehat X_{T+1\vert T}$, plus les valeurs « plausibles » de $\widehat X_{T+2\vert T}$ sont élevées.
-Par ailleurs, le grand axe de l'ellipse (plus long diamètre de l'ellipse) n'est pas sur la première : cela reflète que l'on ne peut avoir de « trop » grandes (ou « trop » petites) valeurs à la fois pour $\widehat X_{T+1\vert T}$ et $\widehat X_{T+2\vert T}$.
-Plus précisément, au seuil $\alpha$, si $\widehat X_{T+1\vert T}$ atteint sa plus grande valeur possible (le point le plus à droite de l'ellipse), alors $\widehat X_{T+2\vert T}<\widehat X_{T+1\vert T}$.
+La forme allongée et orientée à 45 dégrés de la région de confiance reflète une certaine cohérence entre les prévisions de $X_{T+1}$ et $X_{T+2}$ (que l'on a pas quand on construit des intervalles de confiance de manière indépendante). 
+En effet, plus  $\widehat X_{T+1\vert T}$ est grand, plus les valeurs « plausibles » de $\widehat X_{T+2\vert T}$ sont élevées.
+<!-- Par ailleurs, le grand axe de l'ellipse (au plus long diamètre) n'est pas sur la première bissectrice : cela reflète que l'on ne peut avoir de « trop » grandes (ou « trop » petites) valeurs à la fois pour $\widehat X_{T+1\vert T}$ et $\widehat X_{T+2\vert T}$. -->
+<!-- Plus précisément, au seuil $\alpha$, si $\widehat X_{T+1\vert T}$ atteint sa plus grande valeur possible (le point le plus à droite de l'ellipse), alors $\widehat X_{T+2\vert T}<\widehat X_{T+1\vert T}$. -->
+Toutefois, le grand axe de l'ellipse n'est pas aligné à la première bissectric : si $\widehat X_{T+1\vert T}$ atteint sa plus grande valeur possible alors  $\widehat X_{T+2\vert T}<\widehat X_{T+1\vert T}$ (il y a dans ce cas un contrecoup économique). 
 
 
+\begin{figure}[htbp]
+\begin{center}\includegraphics[width = 0.8\textwidth]{img/ellipse} \end{center}
+\captionsetup{margin=0cm,format=hang,justification=justified}
+\caption{Région de confiance pour la prévision de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:RegIC}
+\end{figure}
 
-<!-- ```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)", fig.height=2.8} -->
-<!-- ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS") -->
-<!-- model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE) -->
-<!-- prev <- forecast(model_estime, h = 2) -->
+```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)", fig.height=3}
+ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
+model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
+prev <- forecast(model_estime, h = 2)
 
-<!-- graph_prev(x, x_complet, prev, n_xlabel = 12) -->
-<!-- ``` -->
+graph_prev(x, x_complet, prev, n_xlabel = 12)
+```
 
 
 ## Question 9 : question ouverte sur la causalité
@@ -420,6 +415,9 @@ Puisque les fermetures de raffineries sont rares (elles sont ouvertes tous les j
 
 
 # (APPENDIX) Appendix {-}
+
+\setcounter{page}{0}
+\pagenumbering{roman}
 
 # Annexe 1 : tests supplémentaires sur la qualité des modèles {#sec:qualRes}
 

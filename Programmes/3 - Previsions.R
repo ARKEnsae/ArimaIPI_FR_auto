@@ -1,14 +1,19 @@
 library(forecast)
 library(patchwork)
 library(conics)
-data <- readRDS(file = "Rapport/data/donnees.RDS")
-data_complet <- readRDS(file = "Rapport/data/donnees_completes.RDS")
+
+data <- readRDS(file = "data/donnees.RDS")
+# data <- ts(read.csv("data/donnees.csv")[,-1],
+# 		   start = 2010, frequency = 12)
+
+data_complet <- readRDS(file = "data/donnees_completes.RDS")
 x <- data[, "ipi_cl1"]
 x_complet <- data_complet[, "ipi_cl1"]
-ordres_retenus <- readRDS(file = "Rapport/data/ordres_retenus.RDS")
+ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
 model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
 prev <- forecast(model_estime, h = 2)
 prev
+plot(prev)
 
 #Retrouver les IC : 
 res <- residuals(model_estime)
@@ -61,4 +66,6 @@ ell <- function(x = 103.6517, y = 103.6517,
 
 (c(uniroot(ell,interval = c(95,97))$root,
   uniroot(ell,interval = c(111,113))$root) /102.66 - 1)*100
+
+
 

@@ -1,8 +1,12 @@
 library(forecast)
 library(patchwork)
-data <- readRDS(file = "Rapport/data/donnees.RDS")
+
+data <- readRDS(file = "data/donnees.RDS")
+# data <- ts(read.csv("data/donnees.csv")[,-1],
+# 		   start = 2010, frequency = 12)
+
 x <- data[,"ipi_cl1"]
-x_st <- readRDS(file = "Rapport/data/x_st.RDS")
+x_st <- readRDS(file = "data/x_st.RDS")
 acf(x_st) # q_max = 4
 pacf(x_st) # p_max = 3
 
@@ -64,7 +68,7 @@ models_evalues <- apply(models_possibles,1, evaluation_model, x = x_st,
 						include.mean = FALSE)
 names(models_evalues) <- sprintf("ARIMA(%i,%i,%i)", models_possibles[,"p"],
 								 models_possibles[,"d"], models_possibles[,"q"])
-saveRDS(models_evalues, file = "Rapport/data/models_evalues.RDS")
+saveRDS(models_evalues, file = "data/models_evalues.RDS")
 ## Pour éviter de tout écrire à la main :
 #cat(paste(sprintf("models_evalues$`%s`",names(models_evalues)),collapse = "\n"))
 
@@ -83,7 +87,7 @@ qualite_modeles <- sapply(models_evalues, function(x) x$qualite)
 round(qualite_modeles,1)
 
 ordres_retenus <- c(0,1,1)
-saveRDS(ordres_retenus, file = "Rapport/data/ordres_retenus.RDS")
+saveRDS(ordres_retenus, file = "data/ordres_retenus.RDS")
 
 model_estime <- arima(x, order = ordres_retenus)
 model_estime

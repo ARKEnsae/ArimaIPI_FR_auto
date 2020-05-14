@@ -3,7 +3,11 @@ library(fUnitRoots)
 library(AQLTools)
 library(patchwork)
 
-data <- readRDS(file = "Rapport/data/donnees.RDS")
+data <- readRDS(file = "data/donnees.RDS")
+# data <- ts(read.csv("data/donnees.csv")[,-1],
+# 		   start = 2010, frequency = 12)
+
+
 x <- data[,"ipi_cl1"]
 p1 <- AQLTools::graph_ts(window(x,
 								start = c(2009,10),
@@ -98,5 +102,5 @@ p2 <- AQLTools::graph_ts(window(x_st,
 						 titre = "IPI-CL1 (série différenciée)", n_xlabel = 6)
 p1 + p2 # pas de tendance et a-priori séries stationnaire
 
-saveRDS(x_st, file = "Rapport/data/x_st.RDS")
+saveRDS(x_st, file = "data/x_st.RDS")
 
