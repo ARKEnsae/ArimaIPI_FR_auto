@@ -74,6 +74,10 @@
 
 \usepackage{fontawesome}
 \usepackage{multicol}
+\DeclareMathOperator{\Cov}{Cov}
+\usepackage{mathtools}
+\usepackage{caption}
+\renewcommand{\tablename}{Tableau }
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -284,90 +288,106 @@ Les erreurs de prévision sont égales à :
 \varepsilon_{T+2}+(1+\theta_1)\varepsilon_{T+1}
 \end{cases}
 \]
-Les \(\varepsilon_t\) étant i.i.d., \(\widehat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)\) avec \(\sigma_1^2=\sigma^2\) et \(\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)\). En notant \(q_{1-\frac \alpha 2}\) le quantile \(1-\frac \alpha 2\) d'une loi \(\mathcal N(0,1)\), il vient pour \(h\in\{1,2\}\) :
+Les \(\varepsilon_t\) étant i.i.d., \(\widehat \varepsilon_{T+h\vert T} \overset{(H_0)}{\sim}\mathcal N(0,\sigma_h^2)\) avec \(\sigma_1^2=\sigma^2\) et \(\sigma_h^2=\sigma^2(1+(1+\theta_1)^2)\). De plus \(\Cov(\widehat \varepsilon_{T+1\vert T},\widehat \varepsilon_{T+2\vert T})=\sigma^2(1+\theta_1)\). Donc :
 \[
-\mathbb P\left(
-\left\lvert
-\frac{\widehat \varepsilon_{T+h\vert T}}{\sigma_h}
-\right\rvert\leq q_{1-\frac{\alpha}{2}}
-\right)=
-\mathbb P\left(
-\left\lvert
-\frac{X_{T+h} - \widehat X_{T+h\vert T}}{\sigma_h}
-\right\rvert\leq q_{1-\frac{\alpha}{2}}
-\right)=
-1-\alpha
+\begin{pmatrix}
+    \widehat \varepsilon_{T+1\vert T} \\ \widehat \varepsilon_{T+2\vert T}
+\end{pmatrix} \sim
+\mathcal N \left(
+\begin{pmatrix}
+    0 \\ 0
+\end{pmatrix}\right.,
+\sigma^2 
+\underbrace{
+\begin{pmatrix}
+    1 & 1+\theta_1\\ 1+\theta_1 & 1+ (1+\theta_1)^2
+\end{pmatrix}}_{\Sigma}\left.\mathclap{\phantom{\begin{pmatrix} 0\\0 \end{pmatrix}}}
+\right)
 \]
-Un intervalle de confiance de \(X_{T+h}\) de niveau \(\alpha\) est donc :
+D'où :
+\[\frac{1}{\sigma^2}\Sigma^{-1}
+\begin{pmatrix}
+    \widehat \varepsilon_{T+1\vert T} \\ \widehat \varepsilon_{T+2\vert T}
+\end{pmatrix} \sim
+\mathcal N \left(0_{\mathbb R^2}, I_2\right)\quad\text{avec}\quad
+\Sigma^{-1} = 
+\begin{pmatrix}
+     1+(1+\theta_1)^2 & - (1+\theta_1) \\ -(1+\theta_1) &1
+\end{pmatrix}\]
+Et :
+\[
+\frac{1}{\sigma^2}
+\begin{pmatrix}
+    \widehat \varepsilon_{T+1\vert T} & \widehat \varepsilon_{T+2\vert T}
+\end{pmatrix}
+\Sigma^{-1}
+\begin{pmatrix}
+    \widehat \varepsilon_{T+1\vert T} \\ \widehat \varepsilon_{T+2\vert T}
+\end{pmatrix}\sim{\chi}^2(2) 
+\]
+En notant \(q_{1- \alpha}\) le quantile \(1- \alpha\) d'une loi \({\chi}^2(2)\), une région de confianc de niveau \(\alpha\) pour \((X_{T+1},X_{T+2})\) est :
 \begin{equation}
-IC_{1-\alpha}(X_{T+h}) = \left[
-X_T+ \theta_1\varepsilon_T -q_{1-\frac \alpha 2}{\sigma}_h\;;\;
-X_T+ \theta_1\varepsilon_T +q_{1-\frac \alpha 2}{\sigma}_h
-\right]
+R_\alpha=\left\{ 
+\begin{pmatrix}
+    x \\ y
+\end{pmatrix}\: :\:
+(1+(1+\theta_1)^2)(x-\widehat X_{T+1\vert T})^2-2(1+\theta_1)(x-\widehat X_{T+1\vert T})(y-\widehat X_{T+2\vert T}) + (y-\widehat X_{T+2\vert T})^2\leq \sigma^2q_{1-\alpha} 
+\right\}
 \label{eq:icCourtTerme}
 \end{equation}
 
 Le problème est que \(\sigma_h\) et \(\theta_1\) sont ici inconnus.
-On estime donc \(\theta_1\) par \(\widehat \theta_1\), qui est l'estimation que l'on fait à partir de nos données et \(\sigma_h\) par \(\widehat \sigma_h\) telle que :
-\[
-\widehat\sigma_1 = \widehat\sigma=  \frac{1}{T-2}\sum_{t=2}^T\widehat\varepsilon_t^2
-\text{ et }\quad
-\widehat\sigma_2=\widehat\sigma\sqrt{1+(1+\widehat \theta_1)^2}
-\]
-En remplaçant \(\sigma_h\) et \(\theta_1\) par leurs valeurs estimées, les intervalles de confiance définis dans l'équation \eqref{eq:icCourtTerme} restent valides mais \textbf{asymptotiquement uniquement}.
+On estime donc \(\theta_1\) par \(\widehat \theta_1\), qui est l'estimation que l'on fait à partir de nos données et \(\sigma\) par \(\widehat \sigma= \frac{1}{T-2}\sum_{t=2}^T\widehat\varepsilon_t^2\).
+En remplaçant \(\sigma_h\) et \(\theta_1\) par leurs valeurs estimées, la région de confiance définis dans l'équation \eqref{eq:icCourtTerme} reste valide mais \textbf{asymptotiquement uniquement}.
 
-{[}\emph{Question 6}{]} En somme, on obtient les intervalles de confiance asymptotiques suivants pour \(X_{T+1}\) et \(X_{T+2}\) :
+\begin{figure}[htbp]
+\begin{center}\includegraphics[width = 0.8\textwidth]{img/ellipse} \end{center}
+\captionsetup{margin=0cm,format=hang,justification=justified}
+\caption{Région de confiance pour la prévision de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:RegIC}
+\end{figure}
+
+{[}\emph{Question 6}{]} En somme, la région de confiance pour \((X_{T+1},X_{T+2})\) est l'ellipse :
+
 \begin{equation}
-IC_{1-\alpha}\begin{pmatrix} X_{T+1}
-\\ X_{T+2}\end{pmatrix} =
-\left[
-  \begin{pmatrix} 
-    X_T + \widehat\theta_1\varepsilon_T 
-    \\ X_T + \widehat\theta_1\varepsilon_T 
-  \end{pmatrix}
-  -
-  \widehat\sigma q_{1-\frac \alpha 2}
-  \begin{pmatrix} 
-    1\\
-    \sqrt{1+(1+\widehat \theta_1)^2}
-  \end{pmatrix}
-  \;;\;
-  \begin{pmatrix} 
-    X_T - \widehat\theta_1\varepsilon_T 
-    \\ X_T - \widehat\theta_1\varepsilon_T 
-  \end{pmatrix}
-  +
-  \widehat\sigma q_{1-\frac \alpha 2}
-  \begin{pmatrix} 
-    1\\
-    \sqrt{1+(1+\widehat \theta_1)^2}
-  \end{pmatrix}
-\right]
+\begin{split}
+R_\alpha=\left\{ 
+\begin{pmatrix}
+    x \\ y
+\end{pmatrix}\: :\:\right.
+&(1+(1+\widehat\theta_1)^2)( X_T + \widehat\theta_1\varepsilon_T-x)^2
+-
+2(1+\widehat\theta_1)(X_T + \widehat\theta_1\varepsilon_T-x)(X_T + \widehat\theta_1\varepsilon_T-y) \\
+&+
+(X_T + \widehat\theta_1\varepsilon_T-y)^2\leq \widehat\sigma^2q_{1-\alpha} 
+\left.\right\}
+\end{split}
 \label{eq:icPrev}
 \end{equation}
 
-{[}\emph{Question 7}{]} Pour obtenir ces intervalles de confiance il faut :
+L'application numérique donne :
+\begin{equation}
+R_{95\%}=\left\{ 
+\begin{pmatrix}
+    x \\ y
+\end{pmatrix}\: :\:
+0,016 x^2 - 0,014 \times x \times y + 0,011 y^2 - 1,798 x - 0,885 y + 139,044 = 1
+\right\}
+\label{eq:icApplique}
+\end{equation}
+
+{[}\emph{Question 7}{]} Pour obtenir cette région de confiance il faut :
 
 \begin{itemize}
 \tightlist
 \item
   que le modèle suivit par notre série entre janvier 2010 et février 2020 soit bien un modèle ARIMA(0,1,1). Le modèle doit être en théorie parfaitement identifié (\(\sigma\) et \(\theta_1\) connus ou a minima que leurs estimateurs convergent vers leurs valeurs) ;
 \item
-  que les résidus de notre modèle ARIMA soient \textbf{indépendants, homoscédastiques et suivent une loi normale} : ce qui a bien été vérifié dans la partie précédente ;\\
+  que les résidus de notre modèle ARIMA soient \textbf{indépendants, homoscédastiques et suivent une loi normale} : ce qui a bien été vérifié dans la partie précédente ;
 \item
   que \(T\) soit grand (dans notre cas \(T=120\)).
 \end{itemize}
 
-\begin{figure}
-
-{\centering \includegraphics{img/rmd-prevIpi-1} 
-
-}
-
-\caption{Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:prevIpi}
-\end{figure}
-
-{[}\emph{Question 8}{]} Le graphique \ref{fig:prevIpi} montre cette région de confiance au seuil 95 \%, ainsi qu'à titre de comparaison les valeurs réelles de l'IPI automobile de janvier et de février 2020.
+{[}\emph{Question 8}{]} Le graphique \ref{fig:RegIC} présente la région de confiance au seuil 95 \%, que les intervalles de confiance associés aux deux prévision montre cette région de confiance au seuil 95 \%, ainsi qu'à titre de comparaison les valeurs réelles de l'IPI automobile de janvier et de février 2020.
 On retrouve ce que l'on a montré par l'équation \eqref{eq:icPrev} : la même valeur est prédite pour \(X_{T+1}\) et \(X_{T+2}\) et plus l'horizon augmente plus l'incertitude autour de la prévision augmente (i.e : l'intervalle de confiance est large).
 Prédire les mêmes valeurs pour les deux dates paraît économiquement peu cohérent, mais cela reflète la dynamique du modèle ARIMA(0,1,1) :
 
@@ -376,7 +396,7 @@ Prédire les mêmes valeurs pour les deux dates paraît économiquement peu coh�
   Puisqu'il y a aucun ordre autorégressif, \(\Delta X_t\) ne dépend pas des valeurs passées prises par \((\Delta X_{t'})_{t'\leq t-1}\).
 \item
   Puisque l'ordre MA est égal à 1, il n'y a aucune influence du bruit à l'horizon supérieur ou égal à 2 : sans aucune information supplémentaire, la seule prévision possible pour \(\Delta X_{t+h}\), \(h\geq 2\), est une prévision nulle, et donc pour \(X_{t+h}\) la seule prévision possible est \(\widehat X_{t+1\vert t}\).
-  Cette incertitude se traduit par un intervalle de confiance très grand\footnote{On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,4 \% et +8,3 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).} et une rapide augmentation de cet intervalle.
+  Cette incertitude se traduit par un intervalle de confiance très grand\footnote{On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,8 \% et +8,7 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).} et une rapide augmentation de cet intervalle.
 \end{itemize}
 
 \hypertarget{question-9-question-ouverte-sur-la-causalituxe9}{%
