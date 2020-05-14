@@ -244,9 +244,7 @@ graph_prev <- function(x, x_complet, prev, n_xlabel = 12){
 	
 	
 	p <- ggplot(data = dataGraph, aes(x = date, y = value))+
-		geom_line(size=0.70, aes(color = "ipi")) +
-		geom_ribbon(mapping = aes(x = x, ymin = ymin, ymax = ymax, fill = "ic"),
-					data = ic_df, inherit.aes = FALSE, alpha = 0.2)+
+		geom_line(size=0.70, aes(color = "ipi"))+
 		geom_point(data = data_fin_df, aes(color = "ipireel"))+
 		geom_line(data = data_fin_df, size=0.7,
 				  linetype = "longdash", aes(color = "ipireel"))+
@@ -276,11 +274,7 @@ graph_prev <- function(x, x_complet, prev, n_xlabel = 12){
 		scale_colour_manual(name = "Légende",
 							breaks = c("ipi", "ipireel", "prev"),
 							labels = c("IPI", "IPI observé", "IPI prévu\nARIMA(0,1,1)"),
-							values = c("black", "black", "red")) +
-		scale_fill_manual(name = "Légende",
-						  breaks = "ic",
-						  labels = c("IC (95 %)"),
-						  values = c("black")) +
+							values = c("black", "black", "red"))  +
 		guides(color = guide_legend(keywidth = 2, keyheight = 1,
 									override.aes = list(shape = c(NA,19,19),
 														linetype = c(1,6,6))))
