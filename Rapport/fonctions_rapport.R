@@ -15,7 +15,7 @@ library(forecast)
 footnote_stars <- paste0("\\\\hspace{-0.4cm}\\\\textbf{Signif. codes: }",
 						 "0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1")
 add_stars <- function(x, p_value = ncol(x),
-					  decimal.mark = getOption("OutDec"),
+					  decimal.mark = ",",
 					  digits = 3){
 	stars <- cut(x[, p_value],
 				 breaks = c(0, 0.001, 0.01, 0.05, 0.1, 1),
@@ -28,7 +28,7 @@ add_stars <- function(x, p_value = ncol(x),
 	table
 }
 test_stationnarite <- function(adf, pp, kpss, titre = "",
-							   decimal.mark = getOption("OutDec"),
+							   decimal.mark = ",",
 							   digits = 3){
 	stat <- c(adf@test$statistic, pp$statistic, kpss$statistic)
 	p_val <- c(adf@test$p.value, pp$p.value, kpss$p.value)
@@ -74,7 +74,7 @@ reformat_graph_acf <- function(p, ny = 6, nx = 12){
 ###########################
 
 format_testlb <- function(models_evalues, var = "lbtest", titre = "", 
-						digits = 3, decimal.mark = getOption("OutDec")){
+						digits = 3, decimal.mark = ","){
 	lb <- do.call(cbind, lapply(models_evalues, function(x){
 		add_stars(as.matrix(data.frame(unlist(x[[var]][,2]), 
 									   unlist(x[[var]][,3]))),
@@ -101,13 +101,13 @@ format_testlb <- function(models_evalues, var = "lbtest", titre = "",
 		add_header_above(header) %>% 
 		kable_styling(latex_options = c("hold_position",  "scale_down")) %>% 
 		footnote(general = c(footnote_stars,
-							 "L’hypothèse (H0) d’homoscedasticité des résidus n’est pas rejetée à 5 \\\\% sur les 24 périodes pour l’ensemble des modèles et en particulier pour le modèle retenu ARIMA(0,1,1)."),
+							 "L’hypothèse (H0) d'indépendance des résidus n’est pas rejetée à 5 \\\\% pour le modèle retenu ARIMA(0,1,1)."),
 				 general_title = "",
 				 escape = FALSE,
 				 threeparttable = TRUE)
 }
 format_jbtest <- function(models_evalues, titre = "", 
-						  digits = 3, decimal.mark = getOption("OutDec")){
+						  digits = 3, decimal.mark = ","){
 	stat <- sapply(models_evalues, function(x){
 		x$jbtest$statistic
 	})
@@ -136,7 +136,7 @@ format_jbtest <- function(models_evalues, titre = "",
 }
 
 format_tab_coef <- function(models_evalues, titre = "", 
-							digits = 3, decimal.mark = getOption("OutDec")){
+							digits = 3, decimal.mark = ","){
 	ar <-  t(sapply(models_evalues, function(x){
 		if(identical(x$ttest, 0)){
 			valar <- valma <-
@@ -205,7 +205,7 @@ format_tab_coef <- function(models_evalues, titre = "",
 				 threeparttable = TRUE)
 }
 format_ic <- function(models_evalues, titre = "", 
-					  digits = 3, decimal.mark = getOption("OutDec")){
+					  digits = 3, decimal.mark = ","){
 	qualite_modeles <- sapply(models_evalues, function(x) x$qualite)
 	colnames(qualite_modeles) <- gsub(",0,",",1,", colnames(qualite_modeles))
 	qualite_modeles[c("AIC", "BIC"),] %>% 

@@ -16,16 +16,16 @@ output:
 urlcolor: blue
 themeoptions: "coding=utf8,language=french"
 classoption: 'french'
-lang: "french"
 documentclass: "article"
 geometry: margin=0.95in
 header-includes:
+- \usepackage[french]{babel}
 - \usepackage{fontawesome}
 - \usepackage{multicol}
 - \DeclareMathOperator{\Cov}{Cov}
 - \usepackage{mathtools}
 - \usepackage{caption}
-- \renewcommand{\tablename}{Tableau }
+- \usepackage{xspace}
 before_body-includes:
 - \clearpage
 ---
@@ -134,7 +134,7 @@ t2
 
 # Partie 2 : Modèles ARIMA
 
-Afin de déterminer les ordres maximaux, $p_{max}$ et $q_{max}$, du modèle $ARMA(p,q)$ suivi par la série différenciée de l'IPI dans l'automobile, nous analysons les autocorrélogrammes et les autocorrélogrammes partiels (graphique \@ref(fig:acfPacf)). 
+Afin de déterminer les ordres maximaux, $p_{max}$ et $q_{max}$, du modèle $ARMA(p,q)$ suivi par la série différenciée de l'IPI dans l'automobile, nous analysons les autocorrélogrammes et les autocorrélogrammes partiels (graphique \@ref(fig:acfPacf)). 
 À partir de retard 2 (inclus), aucun autocorrélogramme est significatif à 5 \% : on en déduit que $p_{max} = 1$.
 À partir de retard 2 (inclus), aucun autocorrélogramme partiel est significatif à 5 \%: on en déduit que $q_{max} = 1$.  
 Ainsi, pour savoir quel(s) modèle(s) retenir, nous allons tester tous les modèles $ARMA(p,q)$ tels que $p\leq 1$ et $q\leq 1$.
@@ -338,11 +338,11 @@ Prédire les mêmes valeurs pour les deux dates paraît économiquement peu coh�
 Cette incertitude se traduit par une région de confiance très large^[On prévoit une évolution mensuelle entre décembre 2019 et janvier 2020 comprise entre -6,8 \% et +8,7 \%, ce qui est très grand compte tenu de la volatilité de la série (l'écart-type de la série en évolution est de 4,1 et sa moyenne de 0,1).
 ].
 
-La forme allongée et orientée à 45 dégrés de la région de confiance reflète une certaine cohérence entre les prévisions de $X_{T+1}$ et $X_{T+2}$ (que l'on a pas quand on construit des intervalles de confiance de manière indépendante). 
+La forme allongée et orientée à 45 degrés de la région de confiance reflète une certaine cohérence entre les prévisions de $X_{T+1}$ et $X_{T+2}$ (que l'on a pas quand on construit des intervalles de confiance de manière indépendante). 
 En effet, plus  $\widehat X_{T+1\vert T}$ est grand, plus les valeurs « plausibles » de $\widehat X_{T+2\vert T}$ sont élevées.
 <!-- Par ailleurs, le grand axe de l'ellipse (au plus long diamètre) n'est pas sur la première bissectrice : cela reflète que l'on ne peut avoir de « trop » grandes (ou « trop » petites) valeurs à la fois pour $\widehat X_{T+1\vert T}$ et $\widehat X_{T+2\vert T}$. -->
 <!-- Plus précisément, au seuil $\alpha$, si $\widehat X_{T+1\vert T}$ atteint sa plus grande valeur possible (le point le plus à droite de l'ellipse), alors $\widehat X_{T+2\vert T}<\widehat X_{T+1\vert T}$. -->
-Toutefois, le grand axe de l'ellipse n'est pas aligné à la première bissectric : si $\widehat X_{T+1\vert T}$ atteint sa plus grande valeur possible alors  $\widehat X_{T+2\vert T}<\widehat X_{T+1\vert T}$ (il y a dans ce cas un contrecoup économique). 
+Toutefois, le grand axe de l'ellipse n'est pas aligné à la première bissectrice : si $\widehat X_{T+1\vert T}$ atteint sa plus grande valeur possible alors  $\widehat X_{T+2\vert T}<\widehat X_{T+1\vert T}$ (il y a dans ce cas un contrecoup économique). 
 
 
 \begin{figure}[htbp]

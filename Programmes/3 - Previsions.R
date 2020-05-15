@@ -47,6 +47,7 @@ a_6 <- a*x_p*x_p+2*b*x_p*y_p+d*y_p*y_p
 
 ellispe_eq <- c(a_1, a_2, a_3, a_4,
 				a_5, a_6)
+# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 1
 eq <- paste(round(ellispe_eq, 3),c("x^2","* x * y","y^2","x","y",1),
 			collapse = " + ")
 eq <- paste(gsub("+ -","- ", eq,fixed = TRUE),"= 1")
@@ -56,6 +57,13 @@ eq
 cat(gsub(".", ",",
 		 gsub("*","\\times", eq, fixed = TRUE),
 		 fixed = TRUE))
+
+# Pour tracer l'ellispe :
+# equation sous la forme :
+# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 0
+ellipse <- conicPlot(ellispe_eq - c(0,0,0,0,0,1))
+ellipse
+points(prevs[1], prevs[2])
 
 # Pour obtenir les plus grandes prévisions possibles pour T+1
 ell <- function(x = 103.6517, y = 103.6517, 
