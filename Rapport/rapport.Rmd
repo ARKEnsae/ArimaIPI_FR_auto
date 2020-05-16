@@ -71,11 +71,11 @@ Nous n'effectuons pas ici de correction de point atypique ou de transformation l
 ## Questions 2 et 3 : transformation de la série
 
 ```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement)", include=FALSE}
-data <- readRDS(file = "data/donnees.RDS")
-data_complet <- readRDS(file = "data/donnees_completes.RDS")
-models_evalues <- readRDS(file = "data/models_evalues.RDS")
+data <- readRDS(file = "../data/donnees.RDS")
+data_complet <- readRDS(file = "../data/donnees_completes.RDS")
+models_evalues <- readRDS(file = "../data/models_evalues.RDS")
 x <- data[,"ipi_cl1"]
-x_st <- readRDS(file = "data/x_st.RDS")
+x_st <- readRDS(file = "../data/x_st.RDS")
 x_complet <- data_complet[, "ipi_cl1"]
 
 p1 <- AQLTools::graph_ts(window(x,
@@ -352,7 +352,7 @@ Toutefois, le grand axe de l'ellipse n'est pas aligné à la première bissectri
 \end{figure}
 
 ```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)", fig.height=3}
-ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
+ordres_retenus <- readRDS(file = "../data/ordres_retenus.RDS")
 model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
 prev <- forecast(model_estime, h = 2)
 
