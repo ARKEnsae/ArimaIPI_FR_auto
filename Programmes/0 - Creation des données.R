@@ -1,3 +1,7 @@
+# Codes pour télécharger les séries : 
+# il n'est pas nécessaire de le relancer puisqu'elles
+# sont toutes dans le dossier data/
+
 # devtools::install_github("aqlt/AQLTools")
  library(AQLTools)
  library(zoo)
@@ -18,10 +22,11 @@ saveRDS(data_b,
 saveRDS(data_2010,
 		file = "data/donnees.RDS")
 
+# Exporter en CSV : non utile pour lancer les programmes mais demandé par les consignes
 write.csv(data.frame(date = format(as.yearmon(time(data_2010)), "%m/%Y"),
 							  data_2010),
 				   row.names = FALSE,
 				   file = "data/donnees.csv")
 
-
+# Pour tracer le graphique avec ggplot2
 #AQLTools::graph_ts(window(data,start = 2005))

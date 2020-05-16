@@ -1,6 +1,7 @@
 library(urca)
 library(fUnitRoots)
-library(AQLTools)
+# devtools::install_github("aqlt/AQLTools")
+library(AQLTools) # utiliser pour tracer les séries
 library(patchwork)
 
 data <- readRDS(file = "data/donnees.RDS")
