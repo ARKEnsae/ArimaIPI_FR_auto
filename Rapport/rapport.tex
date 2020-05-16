@@ -115,7 +115,7 @@
 \hypertarget{question-1-description-de-la-suxe9rie-choisie}{%
 \subsection{Question 1 : description de la série choisie}\label{question-1-description-de-la-suxe9rie-choisie}}
 
-Pour ce projet, travaillons sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940).
+Pour ce projet, travaillons sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : \href{https://bdm.insee.fr/series/sdmx/data/SERIES_BDM/010537940}{010537940}).
 Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2, division 29), poste CL1.
 L'industrie automobile concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d'aménagement de véhicules automobiles.
 Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu'ils sont principalement destinés à des véhicules automobiles (à l'exception des parties de moteur).
@@ -129,7 +129,8 @@ Cette désaisonnalisation est réalisée par sous-périodes pour prendre en comp
 Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
 
 Les séries CVS-CJO avant et après 2012 n'étant pas évaluées sur les mêmes modèles, l'idéal serait d'étudier notre série après janvier 2012 pour éviter des ruptures liées à ce changement de modèle. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA.
-C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre \textbf{janvier 2010 et décembre 2019}\footnote{Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.}, c'est-à-dire sur \textbf{120 observations}.
+C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre \textbf{janvier 2010 et décembre 2019}\footnote{Lorsque nous avons commencé ce projet, l'IPI était disponible jusqu'en février 2020.
+  En revanche, les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.}, c'est-à-dire sur \textbf{120 observations}.
 
 Nous n'effectuons pas ici de correction de point atypique ou de transformation logarithmique.
 
@@ -142,7 +143,7 @@ Nous n'effectuons pas ici de correction de point atypique ou de transformation l
 
 }
 
-\caption{IPI dans l'automobile (CVS-CJO) sans et avec différentiation}\label{fig:compGraph}
+\caption{IPI dans l'automobile (CVS-CJO) sans et avec différentiation.}\label{fig:compGraph}
 \end{figure}
 
 Le graphique \ref{fig:compGraph}-(a) ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes à tendance croissante (2010-2011, 2013-2018) et à tendance décroissante (2011-2013 et 2018-2020).
@@ -151,7 +152,7 @@ Ceci est également confirmé par le test de racine unitaire de Phillips-Perron,
 
 \begin{table}[!h]
 
-\caption{\label{tab:tabTestsInit}Tests de racine unitaire et de stationnarité sur la série d'IPI dans l'automobile}
+\caption{\label{tab:tabTestsInit}Tests de racine unitaire et de stationnarité sur la série d'IPI dans l'automobile.}
 \centering
 \begin{threeparttable}
 \begin{tabular}[t]{lccc}
@@ -175,7 +176,7 @@ Cette hypothèse est confirmée par le test de Dickey-Fuller augmenté, effectu�
 
 \begin{table}[!h]
 
-\caption{\label{tab:tabTestsDiff}Tests de racine unitaire et de stationnarité sur la série différenciée d'IPI dans l'automobile}
+\caption{\label{tab:tabTestsDiff}Tests de racine unitaire et de stationnarité sur la série différenciée d'IPI dans l'automobile.}
 \centering
 \begin{threeparttable}
 \begin{tabular}[t]{lccc}
@@ -208,7 +209,7 @@ Ainsi, pour savoir quel(s) modèle(s) retenir, nous allons tester tous les modè
 
 }
 
-\caption{Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile}\label{fig:acfPacf}
+\caption{Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile.}\label{fig:acfPacf}
 \end{figure}
 
 Quatre modèles ARMA ont donc été testés\footnote{Ils ont été estimés sans constante.} afin de s'assurer de l'indépendance des résidus (tableau \ref{tab:tablbtest}) et, si c'est bien le cas, de la significativité des coefficients associés aux ordres maximaux des parties AR et MA des modèles (tableau \ref{tab:tabcoefs}) :
@@ -234,7 +235,7 @@ Parmi l'ensemble des modèles testés, l'ARIMA(0,1,1) est aussi le modèle qui m
 
 \begin{table}[!h]
 
-\caption{\label{tab:aicbic}Critères d'information des modèles ARIMA sur l'IPI de l'automobile}
+\caption{\label{tab:aicbic}Critères d'information des modèles ARIMA sur l'IPI de l'automobile.}
 \centering
 \begin{tabular}[t]{lcccc}
 \toprule
@@ -399,7 +400,7 @@ Toutefois, le grand axe de l'ellipse n'est pas aligné à la première bissectri
 
 }
 
-\caption{Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:prevIpi}
+\caption{Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1).}\label{fig:prevIpi}
 \end{figure}
 
 \hypertarget{question-9-question-ouverte-sur-la-causalituxe9}{%
@@ -458,7 +459,7 @@ Puisque les fermetures de raffineries sont rares (elles sont ouvertes tous les j
 
 \begin{table}[!h]
 
-\caption{\label{tab:tablbtest}Tests de Ljung-Box sur les résidus (tests d'autocorrélation) des modèles ARIMA sur l'IPI de l'automobile}
+\caption{\label{tab:tablbtest}Tests de Ljung-Box sur les résidus (tests d'autocorrélation) des modèles ARIMA sur l'IPI de l'automobile.}
 \centering
 \resizebox{\linewidth}{!}{
 \begin{threeparttable}
@@ -507,7 +508,7 @@ Retards & Statistique & p-valeur &  & Statistique & p-valeur &  & Statistique & 
 
 \begin{table}[!h]
 
-\caption{\label{tab:tabcoefs}Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile}
+\caption{\label{tab:tabcoefs}Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile.}
 \centering
 \begin{threeparttable}
 \begin{tabular}[t]{lcccccccc}
@@ -530,7 +531,7 @@ ARIMA(1,1,1) & 0,165 & 0,214 & 0,439 &  & -0,515 & 0,183 & 0,005 & **\\
 
 \begin{table}[!h]
 
-\caption{\label{tab:tablb2test}Tests de Ljung-Box sur le carré des résidus (tests d'homoscédasticité) des modèles ARIMA sur l'IPI de l'automobile}
+\caption{\label{tab:tablb2test}Tests de Ljung-Box sur le carré des résidus (tests d'homoscédasticité) des modèles ARIMA sur l'IPI de l'automobile.}
 \centering
 \resizebox{\linewidth}{!}{
 \begin{threeparttable}
@@ -579,7 +580,7 @@ Retards & Statistique & p-valeur &  & Statistique & p-valeur &  & Statistique & 
 
 \begin{table}[!h]
 
-\caption{\label{tab:tabjb}Tests de Jarque-Bera de normalité des résidus des modèles ARIMA sur l'IPI de l'automobile}
+\caption{\label{tab:tabjb}Tests de Jarque-Bera de normalité des résidus des modèles ARIMA sur l'IPI de l'automobile.}
 \centering
 \begin{threeparttable}
 \begin{tabular}[t]{lccc}

@@ -50,7 +50,7 @@ source("fonctions_rapport.R",encoding = "UTF-8")
 
 ## Question 1 : description de la série choisie
 
-Pour ce projet, travaillons sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : 010537940). 
+Pour ce projet, travaillons sur la série d'indice de production industrielle (IPI) dans l'industrie automobile (identifiant : [010537940](https://bdm.insee.fr/series/sdmx/data/SERIES_BDM/010537940)). 
 Il s'agit d'une série au niveau A64 de la nomenclature d'activités française révision 2 (NAF rév. 2, division 29), poste CL1.
 L'industrie automobile concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d’aménagement de véhicules automobiles. 
 Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu’ils sont principalement destinés à des véhicules automobiles (à l’exception des parties de moteur).
@@ -64,13 +64,14 @@ Cette désaisonnalisation est réalisée par sous-périodes pour prendre en comp
 Ainsi, les modèles utilisés pour la désaisonnalisation commencent en 2005 et ces modèles sont utilisées pour estimer les séries CVS-CJO à partir de 2012.
 
 Les séries CVS-CJO avant et après 2012 n'étant pas évaluées sur les mêmes modèles, l'idéal serait d'étudier notre série après janvier 2012 pour éviter des ruptures liées à ce changement de modèle. En revanche, cela laisserait une faible profondeur temporelle risquant de fragiliser l'estimation de nos modèles ARIMA. 
-C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre **janvier 2010 et décembre 2019**^[Les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.], c'est-à-dire sur **120 observations**.
+C'est pourquoi nous allons étudier la série d'IPI dans l'industrie automobile entre **janvier 2010 et décembre 2019**^[Lorsque nous avons commencé ce projet, l'IPI était disponible jusqu'en février 2020. 
+En revanche, les derniers points étant souvent sujets à révisions, nous avons préféré ne pas prendre en compte les points de janvier et février 2020.], c'est-à-dire sur **120 observations**.
 
 Nous n'effectuons pas ici de correction de point atypique ou de transformation logarithmique.
 
 ## Questions 2 et 3 : transformation de la série
 
-```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement)", include=FALSE}
+```{r ipiBrut, fig.cap= "IPI dans l'automobile (CVS-CJO sans traitement).", include=FALSE}
 data <- readRDS(file = "../data/donnees.RDS")
 data_complet <- readRDS(file = "../data/donnees_completes.RDS")
 models_evalues <- readRDS(file = "../data/models_evalues.RDS")
@@ -85,7 +86,7 @@ p1 <- AQLTools::graph_ts(window(x,
 p1
 ```
 
-```{r compGraph, fig.cap= "IPI dans l'automobile (CVS-CJO) sans et avec différentiation"}
+```{r compGraph, fig.cap= "IPI dans l'automobile (CVS-CJO) sans et avec différentiation."}
 p1 <- AQLTools::graph_ts(window(x,
 								start = c(2009,10),
 								end = c(2020,2),
@@ -111,7 +112,7 @@ adf <- adfTest(x, type = "c",lags = 2)
 pp <- PP.test(x) 
 kpss <- tseries::kpss.test(x)
 t1 <- test_stationnarite(adf, pp, kpss,
-                   titre = "Tests de racine unitaire et de stationnarité sur la série d'IPI dans l'automobile")
+                   titre = "Tests de racine unitaire et de stationnarité sur la série d'IPI dans l'automobile.")
 t1
 ```
 
@@ -127,7 +128,7 @@ adf <- adfTest(x_st, type = "c",lags = 1)
 pp <- PP.test(x_st) 
 kpss <- tseries::kpss.test(x_st)
 t2 <- test_stationnarite(adf, pp, kpss,
-                   titre = "Tests de racine unitaire et de stationnarité sur la série différenciée d'IPI dans l'automobile")
+                   titre = "Tests de racine unitaire et de stationnarité sur la série différenciée d'IPI dans l'automobile.")
 t2
 ```
 
@@ -139,7 +140,7 @@ Afin de déterminer les ordres maximaux, $p_{max}$ et $q_{max}$, du modèle $ARM
 À partir de retard 2 (inclus), aucun autocorrélogramme partiel est significatif à 5 \%: on en déduit que $q_{max} = 1$.  
 Ainsi, pour savoir quel(s) modèle(s) retenir, nous allons tester tous les modèles $ARMA(p,q)$ tels que $p\leq 1$ et $q\leq 1$.
 
-```{r acfPacf, fig.cap="Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile", fig.height=2}
+```{r acfPacf, fig.cap="Autocorrélogrammes (ACF) et autocorrélogrammes partiels (PACF) pour la série différenciée de l'IPI dans l'automobile.", fig.height=2}
 reformat_graph_acf(ggAcf(x_st)) +
 	reformat_graph_acf(ggPacf(x_st))
 ```
@@ -168,7 +169,7 @@ Parmi l'ensemble des modèles testés, l'ARIMA(0,1,1) est aussi le modèle qui m
 
 ```{r aicbic}
 format_ic(models_evalues, 
-            titre = "Critères d'information des modèles ARIMA sur l'IPI de l'automobile")
+            titre = "Critères d'information des modèles ARIMA sur l'IPI de l'automobile.")
 ```
 
 
@@ -351,7 +352,7 @@ Toutefois, le grand axe de l'ellipse n'est pas aligné à la première bissectri
 \caption{Région de confiance pour la prévision de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)}\label{fig:RegIC}
 \end{figure}
 
-```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1)", fig.height=3}
+```{r prevIpi, fig.cap= "Prévisions de l'IPI automobile CVS-CJO pour janvier et février 2020 par un modèle ARIMA(0,1,1).", fig.height=3}
 ordres_retenus <- readRDS(file = "../data/ordres_retenus.RDS")
 model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
 prev <- forecast(model_estime, h = 2)
@@ -425,20 +426,20 @@ Puisque les fermetures de raffineries sont rares (elles sont ouvertes tous les j
 ```{r tablbtest}
 format_testlb(models_evalues, 
             var = "lbtest",
-            titre = "Tests de Ljung-Box sur les résidus (tests d'autocorrélation) des modèles ARIMA sur l'IPI de l'automobile")
+            titre = "Tests de Ljung-Box sur les résidus (tests d'autocorrélation) des modèles ARIMA sur l'IPI de l'automobile.")
 ```
 
 
 
 ```{r tabcoefs}
 format_tab_coef(models_evalues, 
-            titre = "Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile")
+            titre = "Estimation des coefficients associés aux modèles ARIMA sur l'IPI de l'automobile.")
 ```
 
 ```{r tablb2test}
 format_testlb(models_evalues, 
             var = "lb2test",
-            titre = "Tests de Ljung-Box sur le carré des résidus (tests d'homoscédasticité) des modèles ARIMA sur l'IPI de l'automobile") #%>% 
+            titre = "Tests de Ljung-Box sur le carré des résidus (tests d'homoscédasticité) des modèles ARIMA sur l'IPI de l'automobile.") #%>% 
 		#footnote(footnote_order= c("general","symbol"), #marche pas
 		#		 symbol = "",
 		#		 symbol_manual = c(''))
@@ -447,7 +448,7 @@ format_testlb(models_evalues,
 
 ```{r tabjb}
 format_jbtest(models_evalues, 
-            titre = "Tests de Jarque-Bera de normalité des résidus des modèles ARIMA sur l'IPI de l'automobile") #%>% 
+            titre = "Tests de Jarque-Bera de normalité des résidus des modèles ARIMA sur l'IPI de l'automobile.") #%>% 
 		# footnote(footnote_order= c("symbol","general"), #marche pas
 		# 		 symbol = "\n\nL’hypothèse (H0) de normalité des résidus n’est pas rejetée à 5 % pour l’ensemble des modèles\net en particulier pour le modèle retenu ARIMA(0,1,1).",
 		# 		 symbol_manual = c(''))
