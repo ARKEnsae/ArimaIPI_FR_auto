@@ -26,6 +26,7 @@ header-includes:
 - \usepackage{mathtools}
 - \usepackage{caption}
 - \usepackage{xspace}
+- \usepackage{textpos}
 before_body-includes:
 - \clearpage
 ---
@@ -41,6 +42,12 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = ' ')
 source("fonctions_rapport.R",encoding = "UTF-8")
 ```
+
+\begin{textblock*}{\textwidth}(0cm,-10.7cm)
+\begin{center}
+\includegraphics[height=2cm]{img/LOGO-ENSAE-avatar.png}
+\end{center}
+\end{textblock*}
 
 <!-- Pour faire en sorte que la première page ne soit pas numérotée : -->
 \thispagestyle{empty}

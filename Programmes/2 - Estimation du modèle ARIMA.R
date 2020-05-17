@@ -1,5 +1,5 @@
 library(forecast)
-library(patchwork)
+library(patchwork) # pour mettre à coté deux graphiques ggplot2
 
 data <- readRDS(file = "data/donnees.RDS")
 # data <- ts(read.csv("data/donnees.csv")[,-1],
