@@ -39,7 +39,7 @@ lb_test <- function(x, lag_max = 24, fitdf = 0){
 				   b$p.value
 		)
 	}))
-}# ces deux fonctions sont équivalents : en haut la fonction AQLT, en bas Trinh
+}# ces deux fonctions sont équivalents : en haut la fonction AQLT, en bas TD
 Qtests <- function(series, k = 24, fitdf=0) {
 	pvals <- apply(matrix(1:k), 1, FUN=function(l) {
 		pval <- if (l<=fitdf) NA else Box.test(series, lag=l, type="Ljung-Box", fitdf=fitdf)$p.value 
