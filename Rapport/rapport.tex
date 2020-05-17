@@ -35,7 +35,6 @@
             pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
             colorlinks=true,
             linkcolor=Maroon,
-            filecolor=Maroon,
             citecolor=Blue,
             urlcolor=blue,
             breaklinks=true}
@@ -72,6 +71,12 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
 \usepackage[french]{babel}
 \usepackage{fontawesome}
 \usepackage{multicol}
@@ -79,6 +84,23 @@
 \usepackage{mathtools}
 \usepackage{caption}
 \usepackage{xspace}
+\usepackage{textpos}
+% https://github.com/rstudio/rmarkdown/issues/337
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+% https://github.com/rstudio/rmarkdown/pull/252
+\usepackage{titling}
+\setlength{\droptitle}{-2em}
+
+\pretitle{\vspace{\droptitle}\centering\huge}
+\posttitle{\par}
+
+\preauthor{\centering\large\emph}
+\postauthor{\par}
+
+\predate{\centering\large\emph}
+\postdate{\par}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -106,6 +128,12 @@
 \setcounter{tocdepth}{3}
 \tableofcontents
 }
+\begin{textblock*}{\textwidth}(0cm,-10.7cm)
+\begin{center}
+\includegraphics[height=2cm]{img/LOGO-ENSAE-avatar.png}
+\end{center}
+\end{textblock*}
+
 \thispagestyle{empty}
 \newpage\setcounter{page}{1}
 

@@ -1,6 +1,6 @@
 library(forecast)
-library(patchwork)
-library(conics)
+library(patchwork) # pour mettre à coté deux graphiques ggplot2
+library(conics) # pour tracer une ellipse
 
 data <- readRDS(file = "data/donnees.RDS")
 # data <- ts(read.csv("data/donnees.csv")[,-1],
