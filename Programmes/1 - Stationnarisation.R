@@ -2,7 +2,7 @@ library(urca)
 library(fUnitRoots)
 # devtools::install_github("aqlt/AQLTools")
 library(AQLTools) # utiliser pour tracer les séries
-library(patchwork)
+library(patchwork) # pour mettre à coté deux graphiques ggplot2
 
 data <- readRDS(file = "data/donnees.RDS")
 # data <- ts(read.csv("data/donnees.csv")[,-1],
@@ -16,12 +16,18 @@ p1 <- AQLTools::graph_ts(window(x,
 								extend = TRUE), x_lab = "Dates", y_lab = NULL,
 						 titre = "IPI-CL1 (sans traitement)", n_xlabel = 6)
 p1
-t1 <- time(x)*(time(x)<2013)
-t2 <- time(x)*(time(x)>=2013)
+t1 <- time(x)*(time(x)<2013) # si on veut tester tendance avant 2013
+t2 <- time(x)*(time(x)>=2013) # si on veut tester tendance après 2013
+
+summary(lm(x ~ time(x)))
+summary(lm(x ~ time(x)+t1))
 summary(lm(x ~ time(x)+t2))
 
-# Il y a une tendance assez nette et pas de moyenne : 
-# on peut faire le test ADF avec constante et tendance
+# Même si on observe une tendance dans la régression de la série
+# par rapport au temps, étant donné la rupture de tendance, nous 
+# considérons, comme dans les TD, qu'il y a ici pas de tendance et
+# une moyenne non nulle. 
+# => On fait le test ADF AVEC constante et SANS tendance
 # Pour que le test soit valide il faut rajouter des retards :
 # On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :
 # que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)

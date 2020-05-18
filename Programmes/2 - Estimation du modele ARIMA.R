@@ -7,8 +7,8 @@ data <- readRDS(file = "data/donnees.RDS")
 
 x <- data[,"ipi_cl1"]
 x_st <- readRDS(file = "data/x_st.RDS")
-acf(x_st) # q_max = 4
-pacf(x_st) # p_max = 3
+acf(x_st) # q_max = 1
+pacf(x_st) # p_max = 1
 
 # Fonctions identiques du package forecast mais où on enlève lag = 0
 # Permet d'éviter les confusions pour l'acf
