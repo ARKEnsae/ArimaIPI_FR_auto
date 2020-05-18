@@ -726,12 +726,15 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 
 \CommentTok{# Même si on observe une tendance dans la régression de la série}
 \CommentTok{# par rapport au temps, étant donné la rupture de tendance, nous }
-\CommentTok{# considérons, comme dans les TD, qu'il y a ici pas de tendance et}
+\CommentTok{# considérons, comme dans les TD, qu'il y a ici pas de tendance déterministe et}
 \CommentTok{# une moyenne non nulle. }
 \CommentTok{# => On fait le test ADF AVEC constante et SANS tendance}
 \CommentTok{# Pour que le test soit valide il faut rajouter des retards :}
 \CommentTok{# On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :}
 \CommentTok{# que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)}
+
+\CommentTok{# Cette fonction permet de faire les tests d'indépendance des résidus du modèle ADF }
+\CommentTok{# en fonction du lag }
 \NormalTok{lb_test <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(x, }\DataTypeTok{lag_max =} \DecValTok{24}\NormalTok{, }\DataTypeTok{fitdf =} \DecValTok{0}\NormalTok{)\{}
     \KeywordTok{t}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(}\KeywordTok{seq_len}\NormalTok{(lag_max),}\ControlFlowTok{function}\NormalTok{(l)\{}
         \ControlFlowTok{if}\NormalTok{(l }\OperatorTok{<=}\StringTok{ }\NormalTok{fitdf)\{}
@@ -746,7 +749,11 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \NormalTok{                   b}\OperatorTok{$}\NormalTok{p.value}
 \NormalTok{        )}
 \NormalTok{    \}))}
-\NormalTok{\}}\CommentTok{# ces deux fonctions sont équivalentes : en haut la fonction AQLT, en bas TD}
+\NormalTok{\}}
+
+\CommentTok{# Cette fonction a le même objectif que la fonction précédente }
+\CommentTok{# (tests d'indépendance en fonction du lag) }
+\CommentTok{# mais correspond à celle en corrigé des TD. }
 \NormalTok{Qtests <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(series, }\DataTypeTok{k =} \DecValTok{24}\NormalTok{, }\DataTypeTok{fitdf=}\DecValTok{0}\NormalTok{) \{}
 \NormalTok{    pvals <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{k), }\DecValTok{1}\NormalTok{, }\DataTypeTok{FUN=}\ControlFlowTok{function}\NormalTok{(l) \{}
 \NormalTok{        pval <-}\StringTok{ }\ControlFlowTok{if}\NormalTok{ (l}\OperatorTok{<=}\NormalTok{fitdf) }\OtherTok{NA} \ControlFlowTok{else} \KeywordTok{Box.test}\NormalTok{(series, }\DataTypeTok{lag=}\NormalTok{l, }\DataTypeTok{type=}\StringTok{"Ljung-Box"}\NormalTok{, }\DataTypeTok{fitdf=}\NormalTok{fitdf)}\OperatorTok{$}\NormalTok{p.value }
@@ -754,8 +761,10 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \NormalTok{    \})}
     \KeywordTok{return}\NormalTok{(}\KeywordTok{t}\NormalTok{(pvals))}
 \NormalTok{\}}
-\NormalTok{adfTest_valid <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(series, kmax,type)\{ }
-    \CommentTok{# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés}
+
+
+\CommentTok{# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés}
+\NormalTok{adfTest_valid <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(series, kmax,type)\{}
 \NormalTok{    k <-}\StringTok{ }\DecValTok{0}
 \NormalTok{    noautocorr <-}\StringTok{ }\DecValTok{0}
     \ControlFlowTok{while}\NormalTok{ (noautocorr}\OperatorTok{==}\DecValTok{0}\NormalTok{)\{}
@@ -770,39 +779,52 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
     \KeywordTok{return}\NormalTok{(adf)}
 \NormalTok{\}}
 
-\CommentTok{# On trouve un lag de deux :}
-\KeywordTok{adfTest_valid}\NormalTok{(x, }\DataTypeTok{kmax =} \DecValTok{20}\NormalTok{, }\DataTypeTok{type =} \StringTok{"c"}\NormalTok{) }\CommentTok{#juste constante}
 
+\KeywordTok{adfTest_valid}\NormalTok{(x, }\DataTypeTok{kmax =} \DecValTok{20}\NormalTok{, }\DataTypeTok{type =} \StringTok{"c"}\NormalTok{) }\CommentTok{#juste constante et pas de tendance}
+\CommentTok{# On trouve un lag de 2}
 \NormalTok{adf <-}\StringTok{ }\KeywordTok{adfTest}\NormalTok{(x, }\DataTypeTok{type =} \StringTok{"c"}\NormalTok{,}\DataTypeTok{lags =} \DecValTok{2}\NormalTok{) }\CommentTok{# juste constante et pas de tendance}
-\NormalTok{adf }\CommentTok{# on ne rejette pas : série non stationnaire avec une racine unitaire}
+\NormalTok{adf }\CommentTok{# on ne rejette pas à 5 % : série non stationnaire avec une racine unitaire}
 
-\CommentTok{# vérification tests indépendance}
+\CommentTok{# vérification tests d'indépendance des résidus du modèle ADF }
+\CommentTok{# en fonction du lag (aussi vérifié dans adfTest_valid mais pour bien vérifier)}
 \KeywordTok{lb_test}\NormalTok{(adf}\OperatorTok{@}\NormalTok{test}\OperatorTok{$}\NormalTok{lm}\OperatorTok{$}\NormalTok{residuals, }\DataTypeTok{fitdf=}\KeywordTok{length}\NormalTok{(adf}\OperatorTok{@}\NormalTok{test}\OperatorTok{$}\NormalTok{lm}\OperatorTok{$}\NormalTok{coefficients)) }
+\CommentTok{# les p-valeurs sont bien toutes supérieures à 0,05 : }
+\CommentTok{# OK indépendance des résidus (le test est valide)}
+
 
 \CommentTok{# PP et kpss donnent des résultats similaires}
-\KeywordTok{PP.test}\NormalTok{(x) }\CommentTok{# il y a une racine unitaire}
-\NormalTok{tseries}\OperatorTok{::}\KeywordTok{kpss.test}\NormalTok{(x) }\CommentTok{# série non stationnaire}
+\KeywordTok{PP.test}\NormalTok{(x) }\CommentTok{# on ne rejette pas à 5 % : série non stationnaire avec une racine unitaire}
+\NormalTok{tseries}\OperatorTok{::}\KeywordTok{kpss.test}\NormalTok{(x) }\CommentTok{# on rejette à 5 % : série non stationnaire }
 
 
 \CommentTok{# On différentie la série pour la stationnariser :}
 \NormalTok{x_st <-}\StringTok{ }\KeywordTok{diff}\NormalTok{(x, }\DecValTok{1}\NormalTok{)}
+\CommentTok{# On trace la série différenciée.}
 \NormalTok{AQLTools}\OperatorTok{::}\KeywordTok{graph_ts}\NormalTok{(}\KeywordTok{window}\NormalTok{(x_st,}
                           \DataTypeTok{start =} \KeywordTok{c}\NormalTok{(}\DecValTok{2009}\NormalTok{,}\DecValTok{10}\NormalTok{),}
                           \DataTypeTok{end =} \KeywordTok{c}\NormalTok{(}\DecValTok{2020}\NormalTok{,}\DecValTok{2}\NormalTok{),}
                           \DataTypeTok{extend =} \OtherTok{TRUE}\NormalTok{), }\DataTypeTok{x_lab =} \StringTok{"Dates"}\NormalTok{, }\DataTypeTok{y_lab =} \OtherTok{NULL}\NormalTok{,}
                    \DataTypeTok{titre =} \StringTok{"IPI-CL1 différenciée"}\NormalTok{, }\DataTypeTok{n_xlabel =} \DecValTok{12}\NormalTok{)}
 \KeywordTok{summary}\NormalTok{(}\KeywordTok{lm}\NormalTok{(x_st }\OperatorTok{~}\StringTok{ }\KeywordTok{time}\NormalTok{(x_st)))}
+\CommentTok{# Série qui parait stationnaire, sans tendance ni constante, }
+\CommentTok{# confirmée par la régression en fonction du temps. }
 
-\CommentTok{# Série qui parait stationnaire, sans tendance ni constante}
+
 \CommentTok{# On le vérifie avec un test ADF}
-\KeywordTok{adfTest_valid}\NormalTok{(x_st, }\DataTypeTok{kmax =} \DecValTok{24}\NormalTok{, }\DataTypeTok{type =} \StringTok{"nc"}\NormalTok{)}
-
+\KeywordTok{adfTest_valid}\NormalTok{(x_st, }\DataTypeTok{kmax =} \DecValTok{24}\NormalTok{, }\DataTypeTok{type =} \StringTok{"nc"}\NormalTok{) }\CommentTok{# test sans tendance ni constante}
 \CommentTok{# Il faut donc utiliser un retard}
-\NormalTok{adf <-}\StringTok{ }\KeywordTok{adfTest}\NormalTok{(x_st, }\DataTypeTok{type =} \StringTok{"nc"}\NormalTok{,}\DataTypeTok{lags =} \DecValTok{1}\NormalTok{)}
-\NormalTok{adf }\CommentTok{# on rejette : série stationnaire.}
 
-\KeywordTok{PP.test}\NormalTok{(x_st) }\CommentTok{# vérifié avec test de Phillips-Perron}
-\NormalTok{tseries}\OperatorTok{::}\KeywordTok{kpss.test}\NormalTok{(x_st) }\CommentTok{# vérifié avec KPSS}
+\NormalTok{adf <-}\StringTok{ }\KeywordTok{adfTest}\NormalTok{(x_st, }\DataTypeTok{type =} \StringTok{"nc"}\NormalTok{,}\DataTypeTok{lags =} \DecValTok{1}\NormalTok{)}\CommentTok{# test dans tendance ni constante}
+\NormalTok{adf }\CommentTok{# on rejette à 5 % : pas de racine unitaire (série stationnaire)}
+
+\CommentTok{# vérification tests d'indépendance}
+\KeywordTok{lb_test}\NormalTok{(adf}\OperatorTok{@}\NormalTok{test}\OperatorTok{$}\NormalTok{lm}\OperatorTok{$}\NormalTok{residuals, }\DataTypeTok{fitdf=}\KeywordTok{length}\NormalTok{(adf}\OperatorTok{@}\NormalTok{test}\OperatorTok{$}\NormalTok{lm}\OperatorTok{$}\NormalTok{coefficients)) }
+\CommentTok{# les p-valeurs sont bien toutes supérieures à 0,05 : }
+\CommentTok{# OK indépendance des résidus (le test est valide)}
+
+\KeywordTok{PP.test}\NormalTok{(x_st) }\CommentTok{# vérifié avec test de Phillips-Perron. On rejette à 5 % : }
+\CommentTok{# pas de racine unitaire (série stationnaire)}
+\NormalTok{tseries}\OperatorTok{::}\KeywordTok{kpss.test}\NormalTok{(x_st) }\CommentTok{# vérifié avec KPSS. On ne rejette pas à 5 % : série stationnaire}
 
 \NormalTok{series_a_tracer <-}\StringTok{ }\KeywordTok{ts.union}\NormalTok{(x, x_st)}
 \NormalTok{p2 <-}\StringTok{ }\NormalTok{AQLTools}\OperatorTok{::}\KeywordTok{graph_ts}\NormalTok{(}\KeywordTok{window}\NormalTok{(x_st,}
@@ -830,7 +852,10 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 
 \NormalTok{x <-}\StringTok{ }\NormalTok{data[,}\StringTok{"ipi_cl1"}\NormalTok{]}
 \NormalTok{x_st <-}\StringTok{ }\KeywordTok{readRDS}\NormalTok{(}\DataTypeTok{file =} \StringTok{"data/x_st.RDS"}\NormalTok{)}
+
+\CommentTok{# graphique des ACF}
 \KeywordTok{acf}\NormalTok{(x_st) }\CommentTok{# q_max = 1}
+\CommentTok{# graphique des PACF}
 \KeywordTok{pacf}\NormalTok{(x_st) }\CommentTok{# p_max = 1}
 
 \CommentTok{# Fonctions identiques du package forecast mais où on enlève lag = 0}
@@ -838,11 +863,16 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \KeywordTok{Acf}\NormalTok{(x_st) }\CommentTok{# q_max = 1}
 \KeywordTok{Pacf}\NormalTok{(x_st) }\CommentTok{# p_max = 1}
 
+\CommentTok{# Deux graphiques côte à côte}
 \KeywordTok{ggAcf}\NormalTok{(x_st) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"ACF"}\NormalTok{) }\OperatorTok{+}
 \StringTok{    }\KeywordTok{ggPacf}\NormalTok{(x_st) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"PACF"}\NormalTok{)}
 
-\CommentTok{# On va tester tous les modèles pour q <= 1, p <= 1}
+\CommentTok{# On va donc tester tous les modèles pour q <= 1, p <= 1}
 
+
+\CommentTok{# Grâce à la fonction evaluation_model, on repère les modèles possibles qui vérifient deux conditions : }
+\CommentTok{# 1) tests d’indépendance des résidus de Ljung-Box}
+\CommentTok{# 2) coefficients associés au qmax ET pmax sont bien significatifs}
 \NormalTok{evaluation_model <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(order, x, }\DataTypeTok{lags =} \DecValTok{24}\NormalTok{, }\DataTypeTok{include.mean =} \OtherTok{TRUE}\NormalTok{)\{}
     \CommentTok{# ici on utilise Arima plutôt que arima pour la fonction accuracy}
 \NormalTok{    model <-}\StringTok{ }\NormalTok{forecast}\OperatorTok{::}\KeywordTok{Arima}\NormalTok{(x, }\DataTypeTok{order =}\NormalTok{ order,}
@@ -900,26 +930,34 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \CommentTok{#cat(paste(sprintf("models_evalues$`%s`",names(models_evalues)),collapse = "\textbackslash{}n"))}
 
 \NormalTok{models_evalues}\OperatorTok{$}\StringTok{`}\DataTypeTok{ARIMA(0,0,0)}\StringTok{`}
-\CommentTok{# Il n'y a pas indépendance des résidus}
+\CommentTok{# Il n'y a pas indépendance des résidus : modèle non valide}
 \NormalTok{models_evalues}\OperatorTok{$}\StringTok{`}\DataTypeTok{ARIMA(1,0,0)}\StringTok{`}
-\CommentTok{# Il n'y a pas indépendance des résidus}
+\CommentTok{# Il n'y a pas indépendance des résidus : modèle non valide}
 \NormalTok{models_evalues}\OperatorTok{$}\StringTok{`}\DataTypeTok{ARIMA(0,0,1)}\StringTok{`}
-\CommentTok{# Modele bon}
+\CommentTok{# Il y a indépendance des résidus et coefficient MA(1) significatif :}
+\CommentTok{# modèle valide}
 \NormalTok{models_evalues}\OperatorTok{$}\StringTok{`}\DataTypeTok{ARIMA(1,0,1)}\StringTok{`}
-\CommentTok{# coef AR1 non significatif}
+\CommentTok{# coef AR1 non significatif : modèle non valide}
 
 \CommentTok{# Bilan : seul modèle valide : ARIMA(0,1,1)}
 
+\CommentTok{# On regarde par curiosité les critère d'informations}
 \NormalTok{qualite_modeles <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(models_evalues, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{$}\NormalTok{qualite)}
 \KeywordTok{round}\NormalTok{(qualite_modeles,}\DecValTok{1}\NormalTok{)}
+\CommentTok{# C'est également le modèle ARIMA(0,0,1) qui présente les meilleurs}
+\CommentTok{# AIC et BIC (les plus petits)}
 
-\NormalTok{ordres_retenus <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{ordres_retenus <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{) }\CommentTok{#sur la série initiale : d = 1 (on l'a différenciée une fois) et q=1 (MA(1)) }
+
 \KeywordTok{saveRDS}\NormalTok{(ordres_retenus, }\DataTypeTok{file =} \StringTok{"data/ordres_retenus.RDS"}\NormalTok{)}
 
 \NormalTok{model_estime <-}\StringTok{ }\KeywordTok{arima}\NormalTok{(x, }\DataTypeTok{order =}\NormalTok{ ordres_retenus)}
 \NormalTok{model_estime}
 \NormalTok{lmtest}\OperatorTok{::}\KeywordTok{coeftest}\NormalTok{(model_estime) }\CommentTok{# coefficients significatifs}
 \NormalTok{residus <-}\StringTok{ }\KeywordTok{residuals}\NormalTok{(model_estime)}
+
+\CommentTok{# On fait les tests d'indépendance des résidus d'un modèle ARIMA en fonction du lag }
+\CommentTok{# (déjà vérifié dans evaluation_model mais pour bien vérifier)}
 \NormalTok{lbtest <-}\StringTok{ }\KeywordTok{t}\NormalTok{(}\KeywordTok{sapply}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{24}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(l)\{}
     \ControlFlowTok{if}\NormalTok{(l }\OperatorTok{<=}\StringTok{ }\KeywordTok{sum}\NormalTok{(model_estime}\OperatorTok{$}\NormalTok{arma[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{]))\{}
 \NormalTok{        b <-}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{statistic =} \OtherTok{NA}\NormalTok{, }\DataTypeTok{p.value =} \OtherTok{NA}\NormalTok{)}
@@ -933,15 +971,17 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \NormalTok{               b}\OperatorTok{$}\NormalTok{p.value}
 \NormalTok{    )}
 \NormalTok{\}))}
-\NormalTok{lbtest }\CommentTok{# résidus biens valides}
-\CommentTok{# On remarque que rien ne reste dans ACF/PACF}
+\NormalTok{lbtest }\CommentTok{# résidus biens valides (p-valeur > 5 %)}
+
 \KeywordTok{ggAcf}\NormalTok{(residus) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"ACF"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
 \StringTok{    }\KeywordTok{ggPacf}\NormalTok{(residus) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"PACF"}\NormalTok{)}
-\CommentTok{#Modèle bien valide}
+\CommentTok{#Modèle bien valide : on remarque que aucun ordre de lag reste significativement non nul dans ACF/PACF}
 
-\NormalTok{tseries}\OperatorTok{::}\KeywordTok{jarque.bera.test}\NormalTok{(residus) }\CommentTok{# résidus normaux : on peut bien faire les ic}
+\NormalTok{tseries}\OperatorTok{::}\KeywordTok{jarque.bera.test}\NormalTok{(residus) }\CommentTok{# on ne rejette pas à 5 %. Résidus normaux : }
+\CommentTok{# on peut bien faire les ic}
 
-\CommentTok{#Remarquons que le modèle que le même modèle serait determiné automatiquement}
+\CommentTok{#Remarquons que le même modèle serait determiné automatiquement avec}
+\CommentTok{# la fonction auto.arima}
 \NormalTok{m <-}\StringTok{ }\KeywordTok{auto.arima}\NormalTok{(x)}
 \NormalTok{m}
 \end{Highlighting}
@@ -965,11 +1005,15 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \NormalTok{x_complet <-}\StringTok{ }\NormalTok{data_complet[, }\StringTok{"ipi_cl1"}\NormalTok{]}
 \NormalTok{ordres_retenus <-}\StringTok{ }\KeywordTok{readRDS}\NormalTok{(}\DataTypeTok{file =} \StringTok{"data/ordres_retenus.RDS"}\NormalTok{)}
 \NormalTok{model_estime <-}\StringTok{ }\KeywordTok{Arima}\NormalTok{(x, }\DataTypeTok{order =}\NormalTok{ ordres_retenus, }\DataTypeTok{include.constant =} \OtherTok{FALSE}\NormalTok{)}
+\CommentTok{# Réalise les prévisions sur 2 périodes du modèle retenu}
 \NormalTok{prev <-}\StringTok{ }\KeywordTok{forecast}\NormalTok{(model_estime, }\DataTypeTok{h =} \DecValTok{2}\NormalTok{)}
 \NormalTok{prev}
+\CommentTok{# On les représente sur un graphique. }
 \KeywordTok{plot}\NormalTok{(prev)}
+\CommentTok{# Attention, ce sont les intervalles de confiance à chaque période }
+\CommentTok{# (et non la région de confiance calculée ci-dessous) qui sont représentés automatiquement. }
 
-\CommentTok{#Retrouver les IC : }
+\CommentTok{#Retrouver les IC du graphique : }
 \NormalTok{res <-}\StringTok{ }\KeywordTok{residuals}\NormalTok{(model_estime)}
 \KeywordTok{sum}\NormalTok{((res }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(res))}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\KeywordTok{length}\NormalTok{(res) }\OperatorTok{-}\StringTok{ }\DecValTok{2}\NormalTok{) }\CommentTok{# sigma2}
 \NormalTok{prev}\OperatorTok{$}\NormalTok{mean[}\DecValTok{1}\NormalTok{]}\OperatorTok{+}\KeywordTok{sqrt}\NormalTok{(model_estime}\OperatorTok{$}\NormalTok{sigma2)}\OperatorTok{*}\KeywordTok{qnorm}\NormalTok{(}\DecValTok{1}\FloatTok{-0.05}\OperatorTok{/}\DecValTok{2}\NormalTok{)}
@@ -980,20 +1024,23 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \NormalTok{theta <-}\StringTok{ }\KeywordTok{coef}\NormalTok{(model_estime)}
 
 \NormalTok{sigma_m1 =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\NormalTok{theta)}\OperatorTok{^}\DecValTok{2}\NormalTok{, }\OperatorTok{-}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\NormalTok{theta),}
-                    \OperatorTok{-}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\NormalTok{theta),}\DecValTok{1}\NormalTok{),}\DataTypeTok{ncol =} \DecValTok{2}\NormalTok{)}
+                    \OperatorTok{-}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\NormalTok{theta),}\DecValTok{1}\NormalTok{),}\DataTypeTok{ncol =} \DecValTok{2}\NormalTok{)}\OperatorTok{/}\NormalTok{sigma2}
 \CommentTok{# Pour vérifier qu'on a bien fait l'inversion de la matrice :}
-\CommentTok{# matlib::Inverse(matrix(c(1, (1+theta),}
+\CommentTok{# matlib::Inverse(sigma2 * matrix(c(1, (1+theta),}
 \CommentTok{#                (1+theta),1+(1+theta)^2),ncol = 2))}
 
 \NormalTok{alpha =}\StringTok{ }\FloatTok{0.05}
-\NormalTok{sigma_m1 <-}\StringTok{ }\NormalTok{sigma_m1}\OperatorTok{/}\NormalTok{(sigma2}\OperatorTok{*}\KeywordTok{qchisq}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{alpha, }\DecValTok{2}\NormalTok{))}
+
+\NormalTok{sigma_sur_quantile <-}\StringTok{ }\NormalTok{sigma_m1}\OperatorTok{/}\NormalTok{(}\KeywordTok{qchisq}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{alpha, }\DecValTok{2}\NormalTok{))}
 \NormalTok{prevs <-}\StringTok{ }\NormalTok{prev}\OperatorTok{$}\NormalTok{mean}
 
-\NormalTok{a =}\StringTok{ }\NormalTok{sigma_m1[}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{]}
-\NormalTok{b =}\StringTok{ }\NormalTok{sigma_m1[}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{]}
-\NormalTok{d =}\StringTok{ }\NormalTok{sigma_m1[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{]}
+\NormalTok{a =}\StringTok{ }\NormalTok{sigma_sur_quantile[}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{]}
+\NormalTok{b =}\StringTok{ }\NormalTok{sigma_sur_quantile[}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{]}
+\NormalTok{d =}\StringTok{ }\NormalTok{sigma_sur_quantile[}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{]}
 \NormalTok{x_p =}\StringTok{ }\NormalTok{prevs[}\DecValTok{1}\NormalTok{]}
 \NormalTok{y_p =}\StringTok{ }\NormalTok{prevs[}\DecValTok{2}\NormalTok{]}
+\CommentTok{# coefficients de l'ellipse : a_1 à a_6}
+\CommentTok{# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 1}
 \NormalTok{a_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\NormalTok{a}
 \NormalTok{a_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{b}
 \NormalTok{a_}\DecValTok{3}\NormalTok{ <-}\StringTok{ }\NormalTok{d}
@@ -1003,7 +1050,7 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 
 \NormalTok{ellispe_eq <-}\StringTok{ }\KeywordTok{c}\NormalTok{(a_}\DecValTok{1}\NormalTok{, a_}\DecValTok{2}\NormalTok{, a_}\DecValTok{3}\NormalTok{, a_}\DecValTok{4}\NormalTok{,}
 \NormalTok{                a_}\DecValTok{5}\NormalTok{, a_}\DecValTok{6}\NormalTok{)}
-\CommentTok{# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 1}
+
 \NormalTok{eq <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\KeywordTok{round}\NormalTok{(ellispe_eq, }\DecValTok{3}\NormalTok{),}\KeywordTok{c}\NormalTok{(}\StringTok{"x^2"}\NormalTok{,}\StringTok{"* x * y"}\NormalTok{,}\StringTok{"y^2"}\NormalTok{,}\StringTok{"x"}\NormalTok{,}\StringTok{"y"}\NormalTok{,}\DecValTok{1}\NormalTok{),}
             \DataTypeTok{collapse =} \StringTok{" + "}\NormalTok{)}
 \NormalTok{eq <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\KeywordTok{gsub}\NormalTok{(}\StringTok{"+ -"}\NormalTok{,}\StringTok{"- "}\NormalTok{, eq,}\DataTypeTok{fixed =} \OtherTok{TRUE}\NormalTok{),}\StringTok{"= 1"}\NormalTok{)}
@@ -1015,21 +1062,13 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
          \DataTypeTok{fixed =} \OtherTok{TRUE}\NormalTok{))}
 
 \CommentTok{# Pour tracer l'ellispe :}
-\CommentTok{# equation sous la forme :}
+\CommentTok{# il faut une equation sous la forme :}
 \CommentTok{# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 0}
+
+\CommentTok{# On trace la prévision avec la région de confiance (ellipse) autour}
 \NormalTok{ellipse <-}\StringTok{ }\KeywordTok{conicPlot}\NormalTok{(ellispe_eq }\OperatorTok{-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \NormalTok{ellipse}
 \KeywordTok{points}\NormalTok{(prevs[}\DecValTok{1}\NormalTok{], prevs[}\DecValTok{2}\NormalTok{])}
-
-\CommentTok{# Pour obtenir les plus grandes prévisions possibles pour T+1}
-\NormalTok{ell <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{x =} \FloatTok{103.6517}\NormalTok{, }\DataTypeTok{y =} \FloatTok{103.6517}\NormalTok{, }
-                \DataTypeTok{ellispe_eq =} \KeywordTok{c}\NormalTok{(}\FloatTok{0.0157341205774816}\NormalTok{, }\FloatTok{-0.0141250037159479}\NormalTok{, }\FloatTok{0.0113328509767077}\NormalTok{, }
-                               \FloatTok{-1.79765568338535}\NormalTok{, }\FloatTok{-0.885257713887019}\NormalTok{, }\FloatTok{139.044239392918}\NormalTok{))\{}
-    \KeywordTok{sum}\NormalTok{(ellispe_eq }\OperatorTok{*}\KeywordTok{c}\NormalTok{(x}\OperatorTok{^}\DecValTok{2}\NormalTok{, x }\OperatorTok{*}\StringTok{ }\NormalTok{y, y}\OperatorTok{^}\DecValTok{2}\NormalTok{, x, y, }\DecValTok{1}\NormalTok{)) }\OperatorTok{-}\StringTok{ }\DecValTok{1}
-\NormalTok{\}}
-
-\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{uniroot}\NormalTok{(ell,}\DataTypeTok{interval =} \KeywordTok{c}\NormalTok{(}\DecValTok{95}\NormalTok{,}\DecValTok{97}\NormalTok{))}\OperatorTok{$}\NormalTok{root,}
-  \KeywordTok{uniroot}\NormalTok{(ell,}\DataTypeTok{interval =} \KeywordTok{c}\NormalTok{(}\DecValTok{111}\NormalTok{,}\DecValTok{113}\NormalTok{))}\OperatorTok{$}\NormalTok{root) }\OperatorTok{/}\FloatTok{102.66} \OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)}\OperatorTok{*}\DecValTok{100}
 \end{Highlighting}
 \end{Shaded}
 

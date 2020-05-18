@@ -474,7 +474,7 @@ L'ensemble du code a été écrit avec l'encodage UTF-8.
 
 Code utilisé pour télécharger les données : non utile pour la suite puisque les données sont jointes au projet.
 
-```{r, eval=FALSE, echo = TRUE}
+```{r prog0, eval=FALSE, echo = TRUE}
 # Codes pour télécharger les séries : 
 # il n'est pas nécessaire de le relancer puisqu'elles
 # sont toutes dans le dossier data/
@@ -510,7 +510,7 @@ write.csv(data.frame(date = format(as.yearmon(time(data_2010)), "%m/%Y"),
 ## Fichier `1 - Stationnarisation.R`
 
 
-```{r, eval=FALSE, echo = TRUE}
+```{r prog1, eval=FALSE, echo = TRUE}
 library(urca)
 library(fUnitRoots)
 # devtools::install_github("aqlt/AQLTools")
@@ -534,12 +534,15 @@ summary(lm(x ~ time(x)))
 
 # Même si on observe une tendance dans la régression de la série
 # par rapport au temps, étant donné la rupture de tendance, nous 
-# considérons, comme dans les TD, qu'il y a ici pas de tendance et
+# considérons, comme dans les TD, qu'il y a ici pas de tendance déterministe et
 # une moyenne non nulle. 
 # => On fait le test ADF AVEC constante et SANS tendance
 # Pour que le test soit valide il faut rajouter des retards :
 # On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :
 # que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)
+
+# Cette fonction permet de faire les tests d'indépendance des résidus du modèle ADF 
+# en fonction du lag 
 lb_test <- function(x, lag_max = 24, fitdf = 0){
 	t(sapply(seq_len(lag_max),function(l){
 		if(l <= fitdf){
@@ -554,7 +557,11 @@ lb_test <- function(x, lag_max = 24, fitdf = 0){
 				   b$p.value
 		)
 	}))
-}# ces deux fonctions sont équivalentes : en haut la fonction AQLT, en bas TD
+}
+
+# Cette fonction a le même objectif que la fonction précédente 
+# (tests d'indépendance en fonction du lag) 
+# mais correspond à celle en corrigé des TD. 
 Qtests <- function(series, k = 24, fitdf=0) {
 	pvals <- apply(matrix(1:k), 1, FUN=function(l) {
 		pval <- if (l<=fitdf) NA else Box.test(series, lag=l, type="Ljung-Box", fitdf=fitdf)$p.value 
@@ -562,8 +569,10 @@ Qtests <- function(series, k = 24, fitdf=0) {
 	})
 	return(t(pvals))
 }
-adfTest_valid <- function(series, kmax,type){ 
-	# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés
+
+
+# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés
+adfTest_valid <- function(series, kmax,type){
 	k <- 0
 	noautocorr <- 0
 	while (noautocorr==0){
@@ -578,39 +587,52 @@ adfTest_valid <- function(series, kmax,type){
 	return(adf)
 }
 
-# On trouve un lag de deux :
-adfTest_valid(x, kmax = 20, type = "c") #juste constante
 
+adfTest_valid(x, kmax = 20, type = "c") #juste constante et pas de tendance
+# On trouve un lag de 2
 adf <- adfTest(x, type = "c",lags = 2) # juste constante et pas de tendance
-adf # on ne rejette pas : série non stationnaire avec une racine unitaire
+adf # on ne rejette pas à 5 % : série non stationnaire avec une racine unitaire
 
-# vérification tests indépendance
+# vérification tests d'indépendance des résidus du modèle ADF 
+# en fonction du lag (aussi vérifié dans adfTest_valid mais pour bien vérifier)
 lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) 
+# les p-valeurs sont bien toutes supérieures à 0,05 : 
+# OK indépendance des résidus (le test est valide)
+
 
 # PP et kpss donnent des résultats similaires
-PP.test(x) # il y a une racine unitaire
-tseries::kpss.test(x) # série non stationnaire
+PP.test(x) # on ne rejette pas à 5 % : série non stationnaire avec une racine unitaire
+tseries::kpss.test(x) # on rejette à 5 % : série non stationnaire 
 
 
 # On différentie la série pour la stationnariser :
 x_st <- diff(x, 1)
+# On trace la série différenciée.
 AQLTools::graph_ts(window(x_st,
 						  start = c(2009,10),
 						  end = c(2020,2),
 						  extend = TRUE), x_lab = "Dates", y_lab = NULL,
 				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
 summary(lm(x_st ~ time(x_st)))
+# Série qui parait stationnaire, sans tendance ni constante, 
+# confirmée par la régression en fonction du temps. 
 
-# Série qui parait stationnaire, sans tendance ni constante
+
 # On le vérifie avec un test ADF
-adfTest_valid(x_st, kmax = 24, type = "nc")
-
+adfTest_valid(x_st, kmax = 24, type = "nc") # test sans tendance ni constante
 # Il faut donc utiliser un retard
-adf <- adfTest(x_st, type = "nc",lags = 1)
-adf # on rejette : série stationnaire.
 
-PP.test(x_st) # vérifié avec test de Phillips-Perron
-tseries::kpss.test(x_st) # vérifié avec KPSS
+adf <- adfTest(x_st, type = "nc",lags = 1)# test dans tendance ni constante
+adf # on rejette à 5 % : pas de racine unitaire (série stationnaire)
+
+# vérification tests d'indépendance
+lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) 
+# les p-valeurs sont bien toutes supérieures à 0,05 : 
+# OK indépendance des résidus (le test est valide)
+
+PP.test(x_st) # vérifié avec test de Phillips-Perron. On rejette à 5 % : 
+# pas de racine unitaire (série stationnaire)
+tseries::kpss.test(x_st) # vérifié avec KPSS. On ne rejette pas à 5 % : série stationnaire
 
 series_a_tracer <- ts.union(x, x_st)
 p2 <- AQLTools::graph_ts(window(x_st,
@@ -625,7 +647,7 @@ saveRDS(x_st, file = "data/x_st.RDS")
 
 ## Fichier `2 - Estimation du modele ARIMA.R`
 
-```{r, eval=FALSE, echo = TRUE}
+```{r prog2, eval=FALSE, echo = TRUE}
 library(forecast)
 library(patchwork) # pour mettre à coté deux graphiques ggplot2
 
@@ -635,7 +657,10 @@ data <- readRDS(file = "data/donnees.RDS")
 
 x <- data[,"ipi_cl1"]
 x_st <- readRDS(file = "data/x_st.RDS")
+
+# graphique des ACF
 acf(x_st) # q_max = 1
+# graphique des PACF
 pacf(x_st) # p_max = 1
 
 # Fonctions identiques du package forecast mais où on enlève lag = 0
@@ -643,11 +668,16 @@ pacf(x_st) # p_max = 1
 Acf(x_st) # q_max = 1
 Pacf(x_st) # p_max = 1
 
+# Deux graphiques côte à côte
 ggAcf(x_st) + labs(title = "ACF") +
 	ggPacf(x_st) + labs(title = "PACF")
 
-# On va tester tous les modèles pour q <= 1, p <= 1
+# On va donc tester tous les modèles pour q <= 1, p <= 1
 
+
+# Grâce à la fonction evaluation_model, on repère les modèles possibles qui vérifient deux conditions : 
+# 1) tests d’indépendance des résidus de Ljung-Box
+# 2) coefficients associés au qmax ET pmax sont bien significatifs
 evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 	# ici on utilise Arima plutôt que arima pour la fonction accuracy
 	model <- forecast::Arima(x, order = order,
@@ -705,26 +735,34 @@ saveRDS(models_evalues, file = "data/models_evalues.RDS")
 #cat(paste(sprintf("models_evalues$`%s`",names(models_evalues)),collapse = "\n"))
 
 models_evalues$`ARIMA(0,0,0)`
-# Il n'y a pas indépendance des résidus
+# Il n'y a pas indépendance des résidus : modèle non valide
 models_evalues$`ARIMA(1,0,0)`
-# Il n'y a pas indépendance des résidus
+# Il n'y a pas indépendance des résidus : modèle non valide
 models_evalues$`ARIMA(0,0,1)`
-# Modele bon
+# Il y a indépendance des résidus et coefficient MA(1) significatif :
+# modèle valide
 models_evalues$`ARIMA(1,0,1)`
-# coef AR1 non significatif
+# coef AR1 non significatif : modèle non valide
 
 # Bilan : seul modèle valide : ARIMA(0,1,1)
 
+# On regarde par curiosité les critère d'informations
 qualite_modeles <- sapply(models_evalues, function(x) x$qualite)
 round(qualite_modeles,1)
+# C'est également le modèle ARIMA(0,0,1) qui présente les meilleurs
+# AIC et BIC (les plus petits)
 
-ordres_retenus <- c(0,1,1)
+ordres_retenus <- c(0,1,1) #sur la série initiale : d = 1 (on l'a différenciée une fois) et q=1 (MA(1)) 
+
 saveRDS(ordres_retenus, file = "data/ordres_retenus.RDS")
 
 model_estime <- arima(x, order = ordres_retenus)
 model_estime
 lmtest::coeftest(model_estime) # coefficients significatifs
 residus <- residuals(model_estime)
+
+# On fait les tests d'indépendance des résidus d'un modèle ARIMA en fonction du lag 
+# (déjà vérifié dans evaluation_model mais pour bien vérifier)
 lbtest <- t(sapply(1:24,function(l){
 	if(l <= sum(model_estime$arma[1:2])){
 		b <- list(statistic = NA, p.value = NA)
@@ -738,22 +776,24 @@ lbtest <- t(sapply(1:24,function(l){
 			   b$p.value
 	)
 }))
-lbtest # résidus biens valides
-# On remarque que rien ne reste dans ACF/PACF
+lbtest # résidus biens valides (p-valeur > 5 %)
+
 ggAcf(residus) + labs(title = "ACF") + 
 	ggPacf(residus) + labs(title = "PACF")
-#Modèle bien valide
+#Modèle bien valide : on remarque que aucun ordre de lag reste significativement non nul dans ACF/PACF
 
-tseries::jarque.bera.test(residus) # résidus normaux : on peut bien faire les ic
+tseries::jarque.bera.test(residus) # on ne rejette pas à 5 %. Résidus normaux : 
+# on peut bien faire les ic
 
-#Remarquons que le modèle que le même modèle serait determiné automatiquement
+#Remarquons que le même modèle serait determiné automatiquement avec
+# la fonction auto.arima
 m <- auto.arima(x)
 m
 ```
 
 ## Fichier `3 - Previsions.R`
 
-```{r, eval=FALSE, echo = TRUE}
+```{r prog3, eval=FALSE, echo = TRUE}
 library(forecast)
 library(patchwork) # pour mettre à coté deux graphiques ggplot2
 library(conics) # pour tracer une ellipse
@@ -767,11 +807,15 @@ x <- data[, "ipi_cl1"]
 x_complet <- data_complet[, "ipi_cl1"]
 ordres_retenus <- readRDS(file = "data/ordres_retenus.RDS")
 model_estime <- Arima(x, order = ordres_retenus, include.constant = FALSE)
+# Réalise les prévisions sur 2 périodes du modèle retenu
 prev <- forecast(model_estime, h = 2)
 prev
+# On les représente sur un graphique. 
 plot(prev)
+# Attention, ce sont les intervalles de confiance à chaque période 
+# (et non la région de confiance calculée ci-dessous) qui sont représentés automatiquement. 
 
-#Retrouver les IC : 
+#Retrouver les IC du graphique : 
 res <- residuals(model_estime)
 sum((res - mean(res))^2) / (length(res) - 2) # sigma2
 prev$mean[1]+sqrt(model_estime$sigma2)*qnorm(1-0.05/2)
@@ -782,20 +826,23 @@ sigma2 <- model_estime$sigma2
 theta <- coef(model_estime)
 
 sigma_m1 = matrix(c(1+(1+theta)^2, -(1+theta),
-					-(1+theta),1),ncol = 2)
+					-(1+theta),1),ncol = 2)/sigma2
 # Pour vérifier qu'on a bien fait l'inversion de la matrice :
-# matlib::Inverse(matrix(c(1, (1+theta),
+# matlib::Inverse(sigma2 * matrix(c(1, (1+theta),
 # 				 (1+theta),1+(1+theta)^2),ncol = 2))
 
 alpha = 0.05
-sigma_m1 <- sigma_m1/(sigma2*qchisq(1-alpha, 2))
+
+sigma_sur_quantile <- sigma_m1/(qchisq(1-alpha, 2))
 prevs <- prev$mean
 
-a = sigma_m1[1,1]
-b = sigma_m1[1,2]
-d = sigma_m1[2,2]
+a = sigma_sur_quantile[1,1]
+b = sigma_sur_quantile[1,2]
+d = sigma_sur_quantile[2,2]
 x_p = prevs[1]
 y_p = prevs[2]
+# coefficients de l'ellipse : a_1 à a_6
+# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 1
 a_1 <- a
 a_2 <- 2*b
 a_3 <- d
@@ -805,7 +852,7 @@ a_6 <- a*x_p*x_p+2*b*x_p*y_p+d*y_p*y_p
 
 ellispe_eq <- c(a_1, a_2, a_3, a_4,
 				a_5, a_6)
-# a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 1
+
 eq <- paste(round(ellispe_eq, 3),c("x^2","* x * y","y^2","x","y",1),
 			collapse = " + ")
 eq <- paste(gsub("+ -","- ", eq,fixed = TRUE),"= 1")
@@ -817,20 +864,12 @@ cat(gsub(".", ",",
 		 fixed = TRUE))
 
 # Pour tracer l'ellispe :
-# equation sous la forme :
+# il faut une equation sous la forme :
 # a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 0
+
+# On trace la prévision avec la région de confiance (ellipse) autour
 ellipse <- conicPlot(ellispe_eq - c(0,0,0,0,0,1))
 ellipse
 points(prevs[1], prevs[2])
-
-# Pour obtenir les plus grandes prévisions possibles pour T+1
-ell <- function(x = 103.6517, y = 103.6517, 
-				ellispe_eq = c(0.0157341205774816, -0.0141250037159479, 0.0113328509767077, 
-							   -1.79765568338535, -0.885257713887019, 139.044239392918)){
-	sum(ellispe_eq *c(x^2, x * y, y^2, x, y, 1)) - 1
-}
-
-(c(uniroot(ell,interval = c(95,97))$root,
-  uniroot(ell,interval = c(111,113))$root) /102.66 - 1)*100
 ```
 
