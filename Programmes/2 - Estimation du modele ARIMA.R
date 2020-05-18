@@ -18,7 +18,7 @@ Pacf(x_st)
 ggAcf(x_st) + labs(title = "ACF") +
 	ggPacf(x_st) + labs(title = "PACF")
 
-# On va tester tous les modèles pour q <= 4, p <= 3
+# On va tester tous les modèles pour q <= 1, p <= 1
 
 evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 	# ici on utilise Arima plutôt que arima pour la fonction accuracy

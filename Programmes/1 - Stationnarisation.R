@@ -87,7 +87,7 @@ AQLTools::graph_ts(window(x_st,
 				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
 summary(lm(x_st ~ time(x_st)))
 
-# Série qui parait stationnaire même si l'amplitude parait plus importante depuis 2016
+# Série qui parait stationnaire
 adfTest_valid(x_st, kmax = 24, type = "nc") # lag2
 
 adf <- adfTest(x_st, type = "nc",lags = 1)
