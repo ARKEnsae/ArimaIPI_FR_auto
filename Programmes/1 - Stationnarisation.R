@@ -1,7 +1,7 @@
 library(urca)
 library(fUnitRoots)
 # devtools::install_github("aqlt/AQLTools")
-library(AQLTools) # utiliser pour tracer les séries
+library(AQLTools) # utilisé pour tracer les séries
 library(patchwork) # pour mettre à coté deux graphiques ggplot2
 
 data <- readRDS(file = "data/donnees.RDS")
@@ -9,19 +9,15 @@ data <- readRDS(file = "data/donnees.RDS")
 # 		   start = 2010, frequency = 12)
 
 
-x <- data[,"ipi_cl1"]
+x <- data[, "ipi_cl1"]
 p1 <- AQLTools::graph_ts(window(x,
 								start = c(2009,10),
 								end = c(2020,2),
 								extend = TRUE), x_lab = "Dates", y_lab = NULL,
 						 titre = "IPI-CL1 (sans traitement)", n_xlabel = 6)
 p1
-t1 <- time(x)*(time(x)<2013) # si on veut tester tendance avant 2013
-t2 <- time(x)*(time(x)>=2013) # si on veut tester tendance après 2013
 
 summary(lm(x ~ time(x)))
-summary(lm(x ~ time(x)+t1))
-summary(lm(x ~ time(x)+t2))
 
 # Même si on observe une tendance dans la régression de la série
 # par rapport au temps, étant donné la rupture de tendance, nous 
@@ -45,7 +41,7 @@ lb_test <- function(x, lag_max = 24, fitdf = 0){
 				   b$p.value
 		)
 	}))
-}# ces deux fonctions sont équivalents : en haut la fonction AQLT, en bas TD
+}# ces deux fonctions sont équivalentes : en haut la fonction AQLT, en bas TD
 Qtests <- function(series, k = 24, fitdf=0) {
 	pvals <- apply(matrix(1:k), 1, FUN=function(l) {
 		pval <- if (l<=fitdf) NA else Box.test(series, lag=l, type="Ljung-Box", fitdf=fitdf)$p.value 
@@ -53,7 +49,8 @@ Qtests <- function(series, k = 24, fitdf=0) {
 	})
 	return(t(pvals))
 }
-adfTest_valid <- function(series, kmax,type){ #tests ADF jusqu’`a des r ́esidus non autocorr ́el ́
+adfTest_valid <- function(series, kmax,type){
+	# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés
 	k <- 0
 	noautocorr <- 0
 	while (noautocorr==0){
@@ -68,20 +65,18 @@ adfTest_valid <- function(series, kmax,type){ #tests ADF jusqu’`a des r ́esid
 	return(adf)
 }
 
-# On trouve un lag de trois :
-adfTest_valid(x, kmax = 20, type = "ct")
-adfTest_valid(x, kmax = 20, type = "c")#juste constante
+# On trouve un lag de deux :
+adfTest_valid(x, kmax = 20, type = "c") #juste constante
 
-adf <- adfTest(x, type = "ct",lags = 2) #constante et tendance 
-adf
-adf <- adfTest(x, type = "c",lags = 2)#juste constante
-adf # on ne rejette pas : série non stationnaire.
-# A priori c'est donc plutôt une marchine aléatoire qu'une tendance déterministe.
-lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) # vérification tests indépendance
+adf <- adfTest(x, type = "c",lags = 2) # juste constante et pas de tendance
+adf # on ne rejette pas : série non stationnaire avec une racine unitaire
+
+# vérification tests indépendance
+lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) 
 
 # PP et kpss donnent des résultats similaires
-PP.test(x) 
-tseries::kpss.test(x)
+PP.test(x) # il y a une racine unitaire
+tseries::kpss.test(x) # série non stationnaire
 
 
 # On différentie la série pour la stationnariser :
@@ -93,11 +88,14 @@ AQLTools::graph_ts(window(x_st,
 				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
 summary(lm(x_st ~ time(x_st)))
 
-# Série qui parait stationnaire
-adfTest_valid(x_st, kmax = 24, type = "nc") # lag2
+# Série qui parait stationnaire, sans tendance ni constante
+# On le vérifie avec un test ADF
+adfTest_valid(x_st, kmax = 24, type = "nc")
 
+# Il faut donc utiliser un retard
 adf <- adfTest(x_st, type = "nc",lags = 1)
 adf # on rejette : série stationnaire.
+
 PP.test(x_st) # vérifié avec test de Phillips-Perron
 tseries::kpss.test(x_st) # vérifié avec KPSS
 
@@ -107,7 +105,7 @@ p2 <- AQLTools::graph_ts(window(x_st,
 								end = c(2020,2),
 								extend = TRUE), x_lab = "Dates", y_lab = NULL,
 						 titre = "IPI-CL1 (série différenciée)", n_xlabel = 6)
-p1 + p2 # pas de tendance et a-priori séries stationnaire
+p1 + p2
 
 saveRDS(x_st, file = "data/x_st.RDS")
 
