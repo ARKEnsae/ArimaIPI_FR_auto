@@ -504,7 +504,7 @@ write.csv(data.frame(date = format(as.yearmon(time(data_2010)), "%m/%Y"),
 				   file = "data/donnees.csv")
 
 # Pour tracer le graphique avec ggplot2
-AQLTools::graph_ts(window(data,start = 2005))
+#AQLTools::graph_ts(window(data,start = 2005))
 ```
 
 ## Fichier `1 - Stationnarisation.R`
@@ -514,27 +514,29 @@ AQLTools::graph_ts(window(data,start = 2005))
 library(urca)
 library(fUnitRoots)
 # devtools::install_github("aqlt/AQLTools")
-library(AQLTools) # utiliser pour tracer les séries
-library(patchwork)
+library(AQLTools) # utilisé pour tracer les séries
+library(patchwork) # pour mettre à coté deux graphiques ggplot2
 
 data <- readRDS(file = "data/donnees.RDS")
 # data <- ts(read.csv("data/donnees.csv")[,-1],
 # 		   start = 2010, frequency = 12)
 
 
-x <- data[,"ipi_cl1"]
+x <- data[, "ipi_cl1"]
 p1 <- AQLTools::graph_ts(window(x,
 								start = c(2009,10),
 								end = c(2020,2),
 								extend = TRUE), x_lab = "Dates", y_lab = NULL,
 						 titre = "IPI-CL1 (sans traitement)", n_xlabel = 6)
 p1
-t1 <- time(x)*(time(x)<2013)
-t2 <- time(x)*(time(x)>=2013)
-summary(lm(x ~ time(x)+t2))
 
-# Il y a une tendance assez nette et pas de moyenne : 
-# on peut faire le test ADF avec constante et tendance
+summary(lm(x ~ time(x)))
+
+# Même si on observe une tendance dans la régression de la série
+# par rapport au temps, étant donné la rupture de tendance, nous 
+# considérons, comme dans les TD, qu'il y a ici pas de tendance et
+# une moyenne non nulle. 
+# => On fait le test ADF AVEC constante et SANS tendance
 # Pour que le test soit valide il faut rajouter des retards :
 # On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :
 # que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)
@@ -561,6 +563,7 @@ Qtests <- function(series, k = 24, fitdf=0) {
 	return(t(pvals))
 }
 adfTest_valid <- function(series, kmax,type){ 
+	# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés
 	k <- 0
 	noautocorr <- 0
 	while (noautocorr==0){
@@ -575,22 +578,18 @@ adfTest_valid <- function(series, kmax,type){
 	return(adf)
 }
 
-# On trouve un lag de trois :
-adfTest_valid(x, kmax = 20, type = "ct")
-adfTest_valid(x, kmax = 20, type = "c")#juste constante
+# On trouve un lag de deux :
+adfTest_valid(x, kmax = 20, type = "c") #juste constante
 
-adf <- adfTest(x, type = "ct",lags = 2) #constante et tendance 
-adf
-adf <- adfTest(x, type = "c",lags = 2)#juste constante
-adf # on ne rejette pas : série non stationnaire.
-# A priori c'est donc plutôt une marchine aléatoire qu'une tendance déterministe.
+adf <- adfTest(x, type = "c",lags = 2) # juste constante et pas de tendance
+adf # on ne rejette pas : série non stationnaire avec une racine unitaire
+
 # vérification tests indépendance
 lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) 
 
-
 # PP et kpss donnent des résultats similaires
-PP.test(x) 
-tseries::kpss.test(x)
+PP.test(x) # il y a une racine unitaire
+tseries::kpss.test(x) # série non stationnaire
 
 
 # On différentie la série pour la stationnariser :
@@ -602,11 +601,14 @@ AQLTools::graph_ts(window(x_st,
 				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
 summary(lm(x_st ~ time(x_st)))
 
-# Série qui parait stationnaire 
-adfTest_valid(x_st, kmax = 24, type = "nc") # lag2
+# Série qui parait stationnaire, sans tendance ni constante
+# On le vérifie avec un test ADF
+adfTest_valid(x_st, kmax = 24, type = "nc")
 
+# Il faut donc utiliser un retard
 adf <- adfTest(x_st, type = "nc",lags = 1)
 adf # on rejette : série stationnaire.
+
 PP.test(x_st) # vérifié avec test de Phillips-Perron
 tseries::kpss.test(x_st) # vérifié avec KPSS
 
@@ -616,7 +618,7 @@ p2 <- AQLTools::graph_ts(window(x_st,
 								end = c(2020,2),
 								extend = TRUE), x_lab = "Dates", y_lab = NULL,
 						 titre = "IPI-CL1 (série différenciée)", n_xlabel = 6)
-p1 + p2 # pas de tendance et a-priori séries stationnaire
+p1 + p2
 
 saveRDS(x_st, file = "data/x_st.RDS")
 ```
@@ -625,7 +627,7 @@ saveRDS(x_st, file = "data/x_st.RDS")
 
 ```{r, eval=FALSE, echo = TRUE}
 library(forecast)
-library(patchwork)
+library(patchwork) # pour mettre à coté deux graphiques ggplot2
 
 data <- readRDS(file = "data/donnees.RDS")
 # data <- ts(read.csv("data/donnees.csv")[,-1],
@@ -638,8 +640,8 @@ pacf(x_st) # p_max = 1
 
 # Fonctions identiques du package forecast mais où on enlève lag = 0
 # Permet d'éviter les confusions pour l'acf
-Acf(x_st)
-Pacf(x_st)
+Acf(x_st) # q_max = 1
+Pacf(x_st) # p_max = 1
 
 ggAcf(x_st) + labs(title = "ACF") +
 	ggPacf(x_st) + labs(title = "PACF")
@@ -651,6 +653,7 @@ evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 	model <- forecast::Arima(x, order = order,
 							 include.mean = include.mean)
 	residus <- residuals(model)
+	# test d'indépendance
 	lbtest <- t(sapply(1:lags,function(l){
 		if(l <= sum(model$arma[1:2])){
 			b <- list(statistic = NA, p.value = NA)
@@ -664,6 +667,7 @@ evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 				   b$p.value
 		)
 	}))
+	# test d'homoscédasticité
 	lb2test <- t(sapply(1:lags,function(l){
 		if(l <= sum(model$arma[1:2])){
 			b <- list(statistic = NA, p.value = NA)
@@ -677,7 +681,9 @@ evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 				   b$p.value
 		)
 	}))
+	# test de normalité
 	jbtest <- tseries::jarque.bera.test(residus)
+	# test significatifité des coefficients
 	ttest <- tryCatch(lmtest::coeftest(model), error = function(e) 0)
 	qualite <- c(AIC(model), BIC(model), accuracy(model))
 	names(qualite) <- c("AIC", "BIC", colnames(accuracy(model)))
@@ -749,8 +755,8 @@ m
 
 ```{r, eval=FALSE, echo = TRUE}
 library(forecast)
-library(patchwork)
-library(conics)
+library(patchwork) # pour mettre à coté deux graphiques ggplot2
+library(conics) # pour tracer une ellipse
 
 data <- readRDS(file = "data/donnees.RDS")
 # data <- ts(read.csv("data/donnees.csv")[,-1],
@@ -775,10 +781,12 @@ prev$mean[2]+sqrt(model_estime$sigma2*(1+(1+model_estime$coef[1])^2))*qnorm(1-0.
 sigma2 <- model_estime$sigma2
 theta <- coef(model_estime)
 
-# matlib::Inverse(matrix(c(1, (1+theta),
-# 				 (1+theta),1+(1+theta)^2),ncol = 2))
 sigma_m1 = matrix(c(1+(1+theta)^2, -(1+theta),
 					-(1+theta),1),ncol = 2)
+# Pour vérifier qu'on a bien fait l'inversion de la matrice :
+# matlib::Inverse(matrix(c(1, (1+theta),
+# 				 (1+theta),1+(1+theta)^2),ncol = 2))
+
 alpha = 0.05
 sigma_m1 <- sigma_m1/(sigma2*qchisq(1-alpha, 2))
 prevs <- prev$mean
