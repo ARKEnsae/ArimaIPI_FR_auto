@@ -167,7 +167,7 @@ Il s'agit d'une série au niveau A64 de la nomenclature d'activités française 
 L'industrie automobile concerne aussi bien la production des constructeurs de voitures particulières, de véhicules de loisir, de véhicules utilitaires que les équipementiers spécialisés, les carrossiers, les assembleurs ou les prestataires de services d'aménagement de véhicules automobiles.
 Cette production intègre donc la filière complète, y compris moteurs et organes mécaniques en amont, dès lors qu'ils sont principalement destinés à des véhicules automobiles (à l'exception des parties de moteur).
 
-Il s'agit d'un indice de Laspeyres\footnote{Les indices de Laspeyres et de Paasche permettent de synthétiser en un indice unique un certain nombre d'indices. L'indice de Laspeyres, le plus célèbre est l'IPC (indice des prix à la consommation).}, en base 2015, chaîné avec des pondérations annuelles (les pondérations correspondant aux valeurs ajoutées des branches associées).
+Il s'agit d'un indice de Laspeyres\footnote{Les indices de Laspeyres et de Paasche permettent de synthétiser en un indice unique un certain nombre d'indices. L'indice de Laspeyres le plus célèbre est l'IPC (indice des prix à la consommation).}, en base 2015, chaîné avec des pondérations annuelles (les pondérations correspondant aux valeurs ajoutées des branches associées).
 L'IPI dans l'industrie automobile est calculé à partir de l'enquête mensuelle de branche, par agrégation de séries ``élémentaires'' estimées en volume\footnote{La série d'IPI dans l'industrie automobile ne tient donc pas compte des variations de prix.}, calculées à un niveau plus fin.
 
 Les séries de l'IPI sont corrigées des variations saisonnières et des jours ouvrables (CVS-CJO) à partir de la méthode X13-ARIMA.
@@ -195,7 +195,7 @@ Nous n'effectuons pas ici de correction de point atypique ou de transformation l
 
 Le graphique \ref{fig:compGraph}-(a) ne montre pas de tendance linéaire déterministe nette sur la période 2010-2020 : on observe plutôt une alternance entre des périodes à tendance croissante (2010-2011, 2013-2018) et à tendance décroissante (2011-2013 et 2018-2020).
 La série de l'IPI dans l'automobile semble plutôt montrer une tendance stochastique : elle n'est sûrement \textbf{pas stationnaire}. Ceci est vérifié en faisant le test Dickey-Fuller augmenté (ADF) avec une constante non nulle et sans tendance : on ne rejette pas l'hypothèse de présence de racine unitaire au seuil de 5 \% (tableau \ref{tab:tabTestsInit}).
-Ceci est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de stationnarité\footnote{Ici, l'hypothèse alternative est la non-stationnarité de la série} de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \%. Nous \textbf{différencions} donc la série.
+Ceci est également confirmé par le test de racine unitaire de Phillips-Perron, non rejeté au seuil de 5 \%, et par le test de stationnarité\footnote{Ici, l'hypothèse alternative est la non-stationnarité de la série.} de Kwiatkowski-Phillips-Schmidt-Shin (KPSS), rejeté au seuil de 5 \%. Nous \textbf{différencions} donc la série.
 
 \begin{table}[!h]
 
