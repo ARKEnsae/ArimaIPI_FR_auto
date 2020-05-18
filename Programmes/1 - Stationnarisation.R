@@ -27,6 +27,8 @@ summary(lm(x ~ time(x)))
 # Pour que le test soit valide il faut rajouter des retards :
 # On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :
 # que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)
+
+# Cette fonction permet de faire les tests d'indépendance des résidus du modèle ADF en fonction du lag 
 lb_test <- function(x, lag_max = 24, fitdf = 0){
 	t(sapply(seq_len(lag_max),function(l){
 		if(l <= fitdf){
@@ -41,7 +43,9 @@ lb_test <- function(x, lag_max = 24, fitdf = 0){
 				   b$p.value
 		)
 	}))
-}# ces deux fonctions sont équivalentes : en haut la fonction AQLT, en bas TD
+}
+
+# Cette fonction a le même objectif que la fonction précédente (tests d'indépendance en fonction du lag) mais correspond à celle en corrigé des TD. 
 Qtests <- function(series, k = 24, fitdf=0) {
 	pvals <- apply(matrix(1:k), 1, FUN=function(l) {
 		pval <- if (l<=fitdf) NA else Box.test(series, lag=l, type="Ljung-Box", fitdf=fitdf)$p.value 
@@ -49,8 +53,10 @@ Qtests <- function(series, k = 24, fitdf=0) {
 	})
 	return(t(pvals))
 }
+
+
+# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés
 adfTest_valid <- function(series, kmax,type){
-	# tests ADF jusqu’à ce que les résidus ne soient pas autocorrélés
 	k <- 0
 	noautocorr <- 0
 	while (noautocorr==0){
@@ -65,39 +71,47 @@ adfTest_valid <- function(series, kmax,type){
 	return(adf)
 }
 
-# On trouve un lag de deux :
-adfTest_valid(x, kmax = 20, type = "c") #juste constante
 
+adfTest_valid(x, kmax = 20, type = "c") #juste constante et pas de tendance
+# On trouve un lag de 2
 adf <- adfTest(x, type = "c",lags = 2) # juste constante et pas de tendance
-adf # on ne rejette pas : série non stationnaire avec une racine unitaire
+adf # on ne rejette pas à 5 % : série non stationnaire avec une racine unitaire
 
-# vérification tests indépendance
+# vérification tests d'indépendance des résidus du modèle ADF en fonction du lag (aussi vérifié dans adfTest_valid mais pour bien vérifier)
 lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) 
+# les p-valeurs sont bien toutes supérieures à 0,05 : OK indépendance des résidus (le test est valide)
+
 
 # PP et kpss donnent des résultats similaires
-PP.test(x) # il y a une racine unitaire
-tseries::kpss.test(x) # série non stationnaire
+PP.test(x) # on ne rejette pas à 5 % : série non stationnaire avec une racine unitaire
+tseries::kpss.test(x) # on rejette à 5 % : série non stationnaire 
 
 
 # On différentie la série pour la stationnariser :
 x_st <- diff(x, 1)
+# On trace la série différenciée.
 AQLTools::graph_ts(window(x_st,
 						  start = c(2009,10),
 						  end = c(2020,2),
 						  extend = TRUE), x_lab = "Dates", y_lab = NULL,
 				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
 summary(lm(x_st ~ time(x_st)))
+# Série qui parait stationnaire, sans tendance ni constante, confirmée par la régression en fonction du temps. 
 
-# Série qui parait stationnaire, sans tendance ni constante
+
 # On le vérifie avec un test ADF
-adfTest_valid(x_st, kmax = 24, type = "nc")
-
+adfTest_valid(x_st, kmax = 24, type = "nc") # test dans tendance ni constante
 # Il faut donc utiliser un retard
-adf <- adfTest(x_st, type = "nc",lags = 1)
-adf # on rejette : série stationnaire.
 
-PP.test(x_st) # vérifié avec test de Phillips-Perron
-tseries::kpss.test(x_st) # vérifié avec KPSS
+adf <- adfTest(x_st, type = "nc",lags = 1)# test dans tendance ni constante
+adf # on rejette à 5 % : pas de racine unitaire (série stationnaire)
+
+# vérification tests d'indépendance
+lb_test(adf@test$lm$residuals, fitdf=length(adf@test$lm$coefficients)) 
+# les p-valeurs sont bien toutes supérieures à 0,05 : OK indépendance des résidus (le test est valide)
+
+PP.test(x_st) # vérifié avec test de Phillips-Perron. on rejette à 5 % : pas de racine unitaire (série stationnaire)
+tseries::kpss.test(x_st) # vérifié avec KPSS. on ne rejette pas à 5 % : série stationnaire
 
 series_a_tracer <- ts.union(x, x_st)
 p2 <- AQLTools::graph_ts(window(x_st,
