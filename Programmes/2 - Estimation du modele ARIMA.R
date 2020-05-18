@@ -12,8 +12,8 @@ pacf(x_st) # p_max = 1
 
 # Fonctions identiques du package forecast mais où on enlève lag = 0
 # Permet d'éviter les confusions pour l'acf
-Acf(x_st)
-Pacf(x_st)
+Acf(x_st) # q_max = 1
+Pacf(x_st) # p_max = 1
 
 ggAcf(x_st) + labs(title = "ACF") +
 	ggPacf(x_st) + labs(title = "PACF")
@@ -25,6 +25,7 @@ evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 	model <- forecast::Arima(x, order = order,
 							 include.mean = include.mean)
 	residus <- residuals(model)
+	# test d'indépendance
 	lbtest <- t(sapply(1:lags,function(l){
 		if(l <= sum(model$arma[1:2])){
 			b <- list(statistic = NA, p.value = NA)
@@ -38,6 +39,7 @@ evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 				   b$p.value
 		)
 	}))
+	# test d'homoscédasticité
 	lb2test <- t(sapply(1:lags,function(l){
 		if(l <= sum(model$arma[1:2])){
 			b <- list(statistic = NA, p.value = NA)
@@ -51,7 +53,9 @@ evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 				   b$p.value
 		)
 	}))
+	# test de normalité
 	jbtest <- tseries::jarque.bera.test(residus)
+	# test significatifité des coefficients
 	ttest <- tryCatch(lmtest::coeftest(model), error = function(e) 0)
 	qualite <- c(AIC(model), BIC(model), accuracy(model))
 	names(qualite) <- c("AIC", "BIC", colnames(accuracy(model)))

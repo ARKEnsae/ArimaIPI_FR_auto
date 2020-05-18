@@ -25,10 +25,12 @@ prev$mean[2]+sqrt(model_estime$sigma2*(1+(1+model_estime$coef[1])^2))*qnorm(1-0.
 sigma2 <- model_estime$sigma2
 theta <- coef(model_estime)
 
-# matlib::Inverse(matrix(c(1, (1+theta),
-# 				 (1+theta),1+(1+theta)^2),ncol = 2))
 sigma_m1 = matrix(c(1+(1+theta)^2, -(1+theta),
 					-(1+theta),1),ncol = 2)
+# Pour vérifier qu'on a bien fait l'inversion de la matrice :
+# matlib::Inverse(matrix(c(1, (1+theta),
+# 				 (1+theta),1+(1+theta)^2),ncol = 2))
+
 alpha = 0.05
 sigma_m1 <- sigma_m1/(sigma2*qchisq(1-alpha, 2))
 prevs <- prev$mean

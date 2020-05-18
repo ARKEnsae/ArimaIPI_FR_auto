@@ -15,8 +15,6 @@ data_2010 <- window(data_b,
 				  start = c(2010, 1),
 				  end = c(2019,12))
 
-
-
 saveRDS(data_b,
 		file = "data/donnees_completes.RDS")
 saveRDS(data_2010,
