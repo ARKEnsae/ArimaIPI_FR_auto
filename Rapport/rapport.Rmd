@@ -43,7 +43,7 @@ options(knitr.kable.NA = ' ')
 source("fonctions_rapport.R",encoding = "UTF-8")
 ```
 
-\begin{textblock*}{\textwidth}(0cm,-10.7cm)
+\begin{textblock*}{\textwidth}(0cm,-14.cm)
 \begin{center}
 \includegraphics[height=2cm]{img/LOGO-ENSAE-avatar.png}
 \end{center}
@@ -468,6 +468,11 @@ format_jbtest(models_evalues,
 
 # Code \faRProject{}
 
+L'ensemble du code a été écrit avec l'encodage UTF-8.
+
+## Fichier `0 - Creation des donnees.R`
+
+Code utilisé pour télécharger les données : non utile pour la suite puisque les données sont jointes au projet.
 
 ```{r, eval=FALSE, echo = TRUE}
 # Codes pour télécharger les séries : 
@@ -501,6 +506,9 @@ write.csv(data.frame(date = format(as.yearmon(time(data_2010)), "%m/%Y"),
 # Pour tracer le graphique avec ggplot2
 AQLTools::graph_ts(window(data,start = 2005))
 ```
+
+## Fichier `1 - Stationnarisation.R`
+
 
 ```{r, eval=FALSE, echo = TRUE}
 library(urca)
@@ -594,7 +602,7 @@ AQLTools::graph_ts(window(x_st,
 				   titre = "IPI-CL1 différenciée", n_xlabel = 12)
 summary(lm(x_st ~ time(x_st)))
 
-# Série qui parait stationnaire même si l'amplitude parait plus importante depuis 2016
+# Série qui parait stationnaire 
 adfTest_valid(x_st, kmax = 24, type = "nc") # lag2
 
 adf <- adfTest(x_st, type = "nc",lags = 1)
@@ -612,6 +620,8 @@ p1 + p2 # pas de tendance et a-priori séries stationnaire
 
 saveRDS(x_st, file = "data/x_st.RDS")
 ```
+
+## Fichier `2 - Estimation du modele ARIMA.R`
 
 ```{r, eval=FALSE, echo = TRUE}
 library(forecast)
@@ -634,7 +644,7 @@ Pacf(x_st)
 ggAcf(x_st) + labs(title = "ACF") +
 	ggPacf(x_st) + labs(title = "PACF")
 
-# On va tester tous les modèles pour q <= 4, p <= 3
+# On va tester tous les modèles pour q <= 1, p <= 1
 
 evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
 	# ici on utilise Arima plutôt que arima pour la fonction accuracy
@@ -734,6 +744,8 @@ tseries::jarque.bera.test(residus) # résidus normaux : on peut bien faire les i
 m <- auto.arima(x)
 m
 ```
+
+## Fichier `3 - Previsions.R`
 
 ```{r, eval=FALSE, echo = TRUE}
 library(forecast)

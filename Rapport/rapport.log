@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.18)  18 MAY 2020 01:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.18)  18 MAY 2020 11:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -870,11 +870,15 @@ LaTeX Font Info:    Font shape `U/fontawesomebrands1/solid/n' in size <10> not
 available
 (Font)              Font shape `U/fontawesomebrands1/regular/n' tried instead o
 n input line 10.
-)
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
+1.
+(/usr/local/texlive/2020/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+))
 \tf@toc=\write5
 \openout5 = `rapport.toc'.
 
-<img/LOGO-ENSAE-avatar.png, id=49, 327.72438pt x 412.03937pt>
+<img/LOGO-ENSAE-avatar.png, id=69, 327.72438pt x 412.03937pt>
 File: img/LOGO-ENSAE-avatar.png Graphic file (type png)
 <use img/LOGO-ENSAE-avatar.png>
 Package pdftex.def Info: img/LOGO-ENSAE-avatar.png  used on input line 152.
@@ -883,7 +887,7 @@ Package pdftex.def Info: img/LOGO-ENSAE-avatar.png  used on input line 152.
 
 {/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./img/L
 OGO-ENSAE-avatar.png>]
-<img/rmd-compGraph-1.pdf, id=68, 565.11125pt x 192.72pt>
+<img/rmd-compGraph-1.pdf, id=89, 565.11125pt x 192.72pt>
 File: img/rmd-compGraph-1.pdf Graphic file (type pdf)
 <use img/rmd-compGraph-1.pdf>
 Package pdftex.def Info: img/rmd-compGraph-1.pdf  used on input line 189.
@@ -897,7 +901,7 @@ been already used, duplicate ignored
                    \relax 
 l.199 
        [1 <./img/rmd-compGraph-1.pdf>]
-<img/rmd-acfPacf-1.pdf, id=95, 558.085pt x 124.465pt>
+<img/rmd-acfPacf-1.pdf, id=116, 558.085pt x 124.465pt>
 File: img/rmd-acfPacf-1.pdf Graphic file (type pdf)
 <use img/rmd-acfPacf-1.pdf>
 Package pdftex.def Info: img/rmd-acfPacf-1.pdf  used on input line 255.
@@ -912,12 +916,12 @@ Overfull \hbox (11.90344pt too wide) detected at line 375
  []
 
 [4]
-<img/ellipse.pdf, id=159, 1013.78757pt x 510.90878pt>
+<img/ellipse.pdf, id=180, 1013.78757pt x 510.90878pt>
 File: img/ellipse.pdf Graphic file (type pdf)
 <use img/ellipse.pdf>
 Package pdftex.def Info: img/ellipse.pdf  used on input line 439.
 (pdftex.def)             Requested size: 381.5771pt x 192.29974pt.
-<img/rmd-prevIpi-1.pdf, id=160, 561.09625pt x 207.77625pt>
+<img/rmd-prevIpi-1.pdf, id=181, 561.09625pt x 207.77625pt>
 File: img/rmd-prevIpi-1.pdf Graphic file (type pdf)
 <use img/rmd-prevIpi-1.pdf>
 Package pdftex.def Info: img/rmd-prevIpi-1.pdf  used on input line 446.
@@ -934,71 +938,56 @@ LaTeX Font Info:    Font shape `U/fontawesomebrands1/solid/n' in size <14.4> no
 t available
 (Font)              Font shape `U/fontawesomebrands1/regular/n' tried instead o
 n input line 657.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 6
-60.
-(/usr/local/texlive/2020/texmf-dist/tex/latex/lm/t1lmtt.fd
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 662.
 LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-662.
+669.
 (/usr/local/texlive/2020/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 666.
-
-Underfull \vbox (badness 10000) detected at line 805
- []
-
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 673.
 [3]
-Underfull \vbox (badness 10000) detected at line 805
+Underfull \vbox (badness 10000) detected at line 815
  []
 
 
-Underfull \vbox (badness 10000) detected at line 805
+Underfull \vbox (badness 10000) detected at line 815
  []
 
-[4]
-Underfull \vbox (badness 10000) detected at line 929
- []
-
-[5]
-Underfull \vbox (badness 10000) detected at line 929
+[4] [5]
+Underfull \vbox (badness 10000) detected at line 942
  []
 
 
-Underfull \vbox (badness 10000) detected at line 929
+Underfull \vbox (badness 10000) detected at line 942
  []
 
 [6]
-Underfull \vbox (badness 10000) detected at line 1010
- []
-
-[7]
-Underfull \vbox (badness 10000) detected at line 1010
+Underfull \vbox (badness 10000) detected at line 942
  []
 
 
-Underfull \vbox (badness 10000) detected at line 1010
+Underfull \vbox (badness 10000) detected at line 942
  []
 
-[8]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1012.
+[7] [8]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1028.
 [9]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1012.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1028.
 (./rapport.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1012.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1012.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1028.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1028.
 
 Package rerunfilecheck Info: File `rapport.out' has not changed.
-(rerunfilecheck)             Checksum: 5B93FEB83C72CCA076F1054702111CFA;2207.
+(rerunfilecheck)             Checksum: 9EE1E4743C2722A699BD2ADFE62BFAF7;3139.
  ) 
 Here is how much of TeX's memory you used:
- 21589 strings out of 480607
- 350481 string characters out of 5903596
- 724584 words of memory out of 5000000
- 36904 multiletter control sequences out of 15000+600000
- 601204 words of font info for 134 fonts, out of 8000000 for 9000
+ 21608 strings out of 480607
+ 350920 string characters out of 5903596
+ 725001 words of memory out of 5000000
+ 36915 multiletter control sequences out of 15000+600000
+ 601522 words of font info for 135 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  54i,22n,43p,813b,520s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local
@@ -1032,10 +1021,10 @@ onts/type1/public/lm/lmri10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1
 20/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2020/texmf-d
 ist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/
 type1/public/lm/lmtti10.pfb>
-Output written on rapport.pdf (16 pages, 663451 bytes).
+Output written on rapport.pdf (16 pages, 666060 bytes).
 PDF statistics:
- 498 PDF objects out of 1000 (max. 8388607)
- 389 compressed objects within 4 object streams
- 65 named destinations out of 1000 (max. 500000)
- 16482 words of extra memory for PDF output out of 17280 (max. 10000000)
+ 526 PDF objects out of 1000 (max. 8388607)
+ 416 compressed objects within 5 object streams
+ 73 named destinations out of 1000 (max. 500000)
+ 16514 words of extra memory for PDF output out of 17280 (max. 10000000)
 

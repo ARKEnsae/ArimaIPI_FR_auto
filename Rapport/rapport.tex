@@ -147,7 +147,7 @@
 \setcounter{tocdepth}{3}
 \tableofcontents
 }
-\begin{textblock*}{\textwidth}(0cm,-10.7cm)
+\begin{textblock*}{\textwidth}(0cm,-14.cm)
 \begin{center}
 \includegraphics[height=2cm]{img/LOGO-ENSAE-avatar.png}
 \end{center}
@@ -656,6 +656,13 @@ ARIMA(1,1,1) & 2,241 & 0,326 & \\
 \hypertarget{code}{%
 \section{\texorpdfstring{Code \faRProject{}}{Code }}\label{code}}
 
+L'ensemble du code a été écrit avec l'encodage UTF-8.
+
+\hypertarget{fichier-0---creation-des-donnees.r}{%
+\subsection{\texorpdfstring{Fichier \texttt{0\ -\ Creation\ des\ donnees.R}}{Fichier 0 - Creation des donnees.R}}\label{fichier-0---creation-des-donnees.r}}
+
+Code utilisé pour télécharger les données : non utile pour la suite puisque les données sont jointes au projet.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Codes pour télécharger les séries : }
@@ -690,6 +697,9 @@ ARIMA(1,1,1) & 2,241 & 0,326 & \\
 \NormalTok{AQLTools}\OperatorTok{::}\KeywordTok{graph_ts}\NormalTok{(}\KeywordTok{window}\NormalTok{(data,}\DataTypeTok{start =} \DecValTok{2005}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+\hypertarget{fichier-1---stationnarisation.r}{%
+\subsection{\texorpdfstring{Fichier \texttt{1\ -\ Stationnarisation.R}}{Fichier 1 - Stationnarisation.R}}\label{fichier-1---stationnarisation.r}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -784,7 +794,7 @@ ARIMA(1,1,1) & 2,241 & 0,326 & \\
                    \DataTypeTok{titre =} \StringTok{"IPI-CL1 différenciée"}\NormalTok{, }\DataTypeTok{n_xlabel =} \DecValTok{12}\NormalTok{)}
 \KeywordTok{summary}\NormalTok{(}\KeywordTok{lm}\NormalTok{(x_st }\OperatorTok{~}\StringTok{ }\KeywordTok{time}\NormalTok{(x_st)))}
 
-\CommentTok{# Série qui parait stationnaire même si l'amplitude parait plus importante depuis 2016}
+\CommentTok{# Série qui parait stationnaire }
 \KeywordTok{adfTest_valid}\NormalTok{(x_st, }\DataTypeTok{kmax =} \DecValTok{24}\NormalTok{, }\DataTypeTok{type =} \StringTok{"nc"}\NormalTok{) }\CommentTok{# lag2}
 
 \NormalTok{adf <-}\StringTok{ }\KeywordTok{adfTest}\NormalTok{(x_st, }\DataTypeTok{type =} \StringTok{"nc"}\NormalTok{,}\DataTypeTok{lags =} \DecValTok{1}\NormalTok{)}
@@ -803,6 +813,9 @@ ARIMA(1,1,1) & 2,241 & 0,326 & \\
 \KeywordTok{saveRDS}\NormalTok{(x_st, }\DataTypeTok{file =} \StringTok{"data/x_st.RDS"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\hypertarget{fichier-2---estimation-du-modele-arima.r}{%
+\subsection{\texorpdfstring{Fichier \texttt{2\ -\ Estimation\ du\ modele\ ARIMA.R}}{Fichier 2 - Estimation du modele ARIMA.R}}\label{fichier-2---estimation-du-modele-arima.r}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -826,7 +839,7 @@ ARIMA(1,1,1) & 2,241 & 0,326 & \\
 \KeywordTok{ggAcf}\NormalTok{(x_st) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"ACF"}\NormalTok{) }\OperatorTok{+}
 \StringTok{    }\KeywordTok{ggPacf}\NormalTok{(x_st) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"PACF"}\NormalTok{)}
 
-\CommentTok{# On va tester tous les modèles pour q <= 4, p <= 3}
+\CommentTok{# On va tester tous les modèles pour q <= 1, p <= 1}
 
 \NormalTok{evaluation_model <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(order, x, }\DataTypeTok{lags =} \DecValTok{24}\NormalTok{, }\DataTypeTok{include.mean =} \OtherTok{TRUE}\NormalTok{)\{}
     \CommentTok{# ici on utilise Arima plutôt que arima pour la fonction accuracy}
@@ -927,6 +940,9 @@ ARIMA(1,1,1) & 2,241 & 0,326 & \\
 \NormalTok{m}
 \end{Highlighting}
 \end{Shaded}
+
+\hypertarget{fichier-3---previsions.r}{%
+\subsection{\texorpdfstring{Fichier \texttt{3\ -\ Previsions.R}}{Fichier 3 - Previsions.R}}\label{fichier-3---previsions.r}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
