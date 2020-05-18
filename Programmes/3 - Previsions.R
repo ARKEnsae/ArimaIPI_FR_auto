@@ -68,12 +68,10 @@ cat(gsub(".", ",",
 		 fixed = TRUE))
 
 # Pour tracer l'ellispe :
-# equation sous la forme :
+# il faut une equation sous la forme :
 # a_1 * x^2 + a_2 * x * y + a_3 * y^2 + a_4 * x + a_5 * y + a_6 = 0
 
 # On trace la prévision avec la région de confiance (ellipse) autour
 ellipse <- conicPlot(ellispe_eq - c(0,0,0,0,0,1))
 ellipse
 points(prevs[1], prevs[2])
-
-

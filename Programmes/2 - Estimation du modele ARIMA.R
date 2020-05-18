@@ -89,8 +89,8 @@ models_evalues$`ARIMA(0,0,0)`
 models_evalues$`ARIMA(1,0,0)`
 # Il n'y a pas indépendance des résidus : modèle non valide
 models_evalues$`ARIMA(0,0,1)`
-# Il y a indépendance des résidus et coefficient MA(1) significatif
-# : modèle valide
+# Il y a indépendance des résidus et coefficient MA(1) significatif :
+# modèle valide
 models_evalues$`ARIMA(1,0,1)`
 # coef AR1 non significatif : modèle non valide
 
@@ -111,7 +111,8 @@ model_estime
 lmtest::coeftest(model_estime) # coefficients significatifs
 residus <- residuals(model_estime)
 
-# On fait les tests d'indépendance des résidus d'un modèle ARIMA en fonction du lag (déjà vérifié dans evaluation_model mais pour bien vérifier)
+# On fait les tests d'indépendance des résidus d'un modèle ARIMA en fonction du lag 
+# (déjà vérifié dans evaluation_model mais pour bien vérifier)
 lbtest <- t(sapply(1:24,function(l){
 	if(l <= sum(model_estime$arma[1:2])){
 		b <- list(statistic = NA, p.value = NA)
