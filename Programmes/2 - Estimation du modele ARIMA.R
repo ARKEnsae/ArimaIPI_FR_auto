@@ -96,7 +96,7 @@ models_evalues$`ARIMA(1,0,1)`
 
 # Bilan : seul modèle valide : ARIMA(0,1,1)
 
-# On regarde par curiosité les critère d'informations
+# On regarde par curiosité les critères d'information
 qualite_modeles <- sapply(models_evalues, function(x) x$qualite)
 round(qualite_modeles,1)
 # C'est également le modèle ARIMA(0,0,1) qui présente les meilleurs

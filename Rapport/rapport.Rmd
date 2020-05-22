@@ -43,9 +43,9 @@ options(knitr.kable.NA = ' ')
 source("fonctions_rapport.R",encoding = "UTF-8")
 ```
 
-\begin{textblock*}{\textwidth}(0cm,-14.cm)
+\begin{textblock*}{\textwidth}(0cm,-14.5cm)
 \begin{center}
-\includegraphics[height=2cm]{img/LOGO-ENSAE-avatar.png}
+\includegraphics[height=2.5cm]{img/LOGO-ENSAE-avatar.png}
 \end{center}
 \end{textblock*}
 
@@ -539,7 +539,8 @@ summary(lm(x ~ time(x)))
 # => On fait le test ADF AVEC constante et SANS tendance
 # Pour que le test soit valide il faut rajouter des retards :
 # On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :
-# que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)
+# que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables
+# omises)
 
 # Cette fonction permet de faire les tests d'indépendance des résidus du modèle ADF 
 # en fonction du lag 
@@ -564,7 +565,8 @@ lb_test <- function(x, lag_max = 24, fitdf = 0){
 # mais correspond à celle en corrigé des TD. 
 Qtests <- function(series, k = 24, fitdf=0) {
 	pvals <- apply(matrix(1:k), 1, FUN=function(l) {
-		pval <- if (l<=fitdf) NA else Box.test(series, lag=l, type="Ljung-Box", fitdf=fitdf)$p.value 
+		pval <- if (l<=fitdf) NA else Box.test(series, lag=l, type="Ljung-Box",
+											   fitdf=fitdf)$p.value 
 		return(c("lag"=l,"pval"=pval))
 	})
 	return(t(pvals))
@@ -675,7 +677,8 @@ ggAcf(x_st) + labs(title = "ACF") +
 # On va donc tester tous les modèles pour q <= 1, p <= 1
 
 
-# Grâce à la fonction evaluation_model, on repère les modèles possibles qui vérifient deux conditions : 
+# Grâce à la fonction evaluation_model, on repère les modèles
+# possibles qui vérifient deux conditions : 
 # 1) tests d’indépendance des résidus de Ljung-Box
 # 2) coefficients associés au qmax ET pmax sont bien significatifs
 evaluation_model <- function(order, x, lags = 24, include.mean = TRUE){
@@ -746,13 +749,14 @@ models_evalues$`ARIMA(1,0,1)`
 
 # Bilan : seul modèle valide : ARIMA(0,1,1)
 
-# On regarde par curiosité les critère d'informations
+# On regarde par curiosité les critères d'information
 qualite_modeles <- sapply(models_evalues, function(x) x$qualite)
 round(qualite_modeles,1)
 # C'est également le modèle ARIMA(0,0,1) qui présente les meilleurs
 # AIC et BIC (les plus petits)
 
-ordres_retenus <- c(0,1,1) #sur la série initiale : d = 1 (on l'a différenciée une fois) et q=1 (MA(1)) 
+ordres_retenus <- c(0,1,1) #sur la série initiale : d = 1 
+# (on l'a différenciée une fois) et q=1 (MA(1)) 
 
 saveRDS(ordres_retenus, file = "data/ordres_retenus.RDS")
 
@@ -780,7 +784,8 @@ lbtest # résidus biens valides (p-valeur > 5 %)
 
 ggAcf(residus) + labs(title = "ACF") + 
 	ggPacf(residus) + labs(title = "PACF")
-#Modèle bien valide : on remarque que aucun ordre de lag reste significativement non nul dans ACF/PACF
+#Modèle bien valide : on remarque que aucun ordre de lag reste significativement non nul
+# dans ACF/PACF
 
 tseries::jarque.bera.test(residus) # on ne rejette pas à 5 %. Résidus normaux : 
 # on peut bien faire les ic

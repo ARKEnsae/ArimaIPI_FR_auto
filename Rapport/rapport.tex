@@ -35,7 +35,6 @@
             pdfauthor={Kim Antunez et Alain Quartier-la-Tente},
             colorlinks=true,
             linkcolor=Maroon,
-            filecolor=Maroon,
             citecolor=Blue,
             urlcolor=blue,
             breaklinks=true}
@@ -147,9 +146,9 @@
 \setcounter{tocdepth}{3}
 \tableofcontents
 }
-\begin{textblock*}{\textwidth}(0cm,-14.cm)
+\begin{textblock*}{\textwidth}(0cm,-14.5cm)
 \begin{center}
-\includegraphics[height=2cm]{img/LOGO-ENSAE-avatar.png}
+\includegraphics[height=2.5cm]{img/LOGO-ENSAE-avatar.png}
 \end{center}
 \end{textblock*}
 
@@ -731,7 +730,8 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \CommentTok{# => On fait le test ADF AVEC constante et SANS tendance}
 \CommentTok{# Pour que le test soit valide il faut rajouter des retards :}
 \CommentTok{# On fait donc le test jusqu'à ce que les résidus du modèles de "ADF" soient bons :}
-\CommentTok{# que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables omises)}
+\CommentTok{# que les résidus soient indépendants (on ne veut plus d'endogénéité dû aux variables}
+\CommentTok{# omises)}
 
 \CommentTok{# Cette fonction permet de faire les tests d'indépendance des résidus du modèle ADF }
 \CommentTok{# en fonction du lag }
@@ -756,7 +756,8 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \CommentTok{# mais correspond à celle en corrigé des TD. }
 \NormalTok{Qtests <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(series, }\DataTypeTok{k =} \DecValTok{24}\NormalTok{, }\DataTypeTok{fitdf=}\DecValTok{0}\NormalTok{) \{}
 \NormalTok{    pvals <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{k), }\DecValTok{1}\NormalTok{, }\DataTypeTok{FUN=}\ControlFlowTok{function}\NormalTok{(l) \{}
-\NormalTok{        pval <-}\StringTok{ }\ControlFlowTok{if}\NormalTok{ (l}\OperatorTok{<=}\NormalTok{fitdf) }\OtherTok{NA} \ControlFlowTok{else} \KeywordTok{Box.test}\NormalTok{(series, }\DataTypeTok{lag=}\NormalTok{l, }\DataTypeTok{type=}\StringTok{"Ljung-Box"}\NormalTok{, }\DataTypeTok{fitdf=}\NormalTok{fitdf)}\OperatorTok{$}\NormalTok{p.value }
+\NormalTok{        pval <-}\StringTok{ }\ControlFlowTok{if}\NormalTok{ (l}\OperatorTok{<=}\NormalTok{fitdf) }\OtherTok{NA} \ControlFlowTok{else} \KeywordTok{Box.test}\NormalTok{(series, }\DataTypeTok{lag=}\NormalTok{l, }\DataTypeTok{type=}\StringTok{"Ljung-Box"}\NormalTok{,}
+                                               \DataTypeTok{fitdf=}\NormalTok{fitdf)}\OperatorTok{$}\NormalTok{p.value }
         \KeywordTok{return}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"lag"}\NormalTok{=l,}\StringTok{"pval"}\NormalTok{=pval))}
 \NormalTok{    \})}
     \KeywordTok{return}\NormalTok{(}\KeywordTok{t}\NormalTok{(pvals))}
@@ -870,7 +871,8 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \CommentTok{# On va donc tester tous les modèles pour q <= 1, p <= 1}
 
 
-\CommentTok{# Grâce à la fonction evaluation_model, on repère les modèles possibles qui vérifient deux conditions : }
+\CommentTok{# Grâce à la fonction evaluation_model, on repère les modèles}
+\CommentTok{# possibles qui vérifient deux conditions : }
 \CommentTok{# 1) tests d’indépendance des résidus de Ljung-Box}
 \CommentTok{# 2) coefficients associés au qmax ET pmax sont bien significatifs}
 \NormalTok{evaluation_model <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(order, x, }\DataTypeTok{lags =} \DecValTok{24}\NormalTok{, }\DataTypeTok{include.mean =} \OtherTok{TRUE}\NormalTok{)\{}
@@ -926,7 +928,7 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 \KeywordTok{names}\NormalTok{(models_evalues) <-}\StringTok{ }\KeywordTok{sprintf}\NormalTok{(}\StringTok{"ARIMA(%i,%i,%i)"}\NormalTok{, models_possibles[,}\StringTok{"p"}\NormalTok{],}
 \NormalTok{                                 models_possibles[,}\StringTok{"d"}\NormalTok{], models_possibles[,}\StringTok{"q"}\NormalTok{])}
 \KeywordTok{saveRDS}\NormalTok{(models_evalues, }\DataTypeTok{file =} \StringTok{"data/models_evalues.RDS"}\NormalTok{)}
-\CommentTok{## Pour éviter de tout écrire à la main :}
+\NormalTok{## Pour éviter de tout écrire à la main :}
 \CommentTok{#cat(paste(sprintf("models_evalues$`%s`",names(models_evalues)),collapse = "\textbackslash{}n"))}
 
 \NormalTok{models_evalues}\OperatorTok{$}\StringTok{`}\DataTypeTok{ARIMA(0,0,0)}\StringTok{`}
@@ -941,13 +943,14 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 
 \CommentTok{# Bilan : seul modèle valide : ARIMA(0,1,1)}
 
-\CommentTok{# On regarde par curiosité les critère d'informations}
+\CommentTok{# On regarde par curiosité les critères d'information}
 \NormalTok{qualite_modeles <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(models_evalues, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{$}\NormalTok{qualite)}
 \KeywordTok{round}\NormalTok{(qualite_modeles,}\DecValTok{1}\NormalTok{)}
 \CommentTok{# C'est également le modèle ARIMA(0,0,1) qui présente les meilleurs}
 \CommentTok{# AIC et BIC (les plus petits)}
 
-\NormalTok{ordres_retenus <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{) }\CommentTok{#sur la série initiale : d = 1 (on l'a différenciée une fois) et q=1 (MA(1)) }
+\NormalTok{ordres_retenus <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{) }\CommentTok{#sur la série initiale : d = 1 }
+\CommentTok{# (on l'a différenciée une fois) et q=1 (MA(1)) }
 
 \KeywordTok{saveRDS}\NormalTok{(ordres_retenus, }\DataTypeTok{file =} \StringTok{"data/ordres_retenus.RDS"}\NormalTok{)}
 
@@ -975,7 +978,8 @@ Code utilisé pour télécharger les données : non utile pour la suite puisque 
 
 \KeywordTok{ggAcf}\NormalTok{(residus) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"ACF"}\NormalTok{) }\OperatorTok{+}\StringTok{ }
 \StringTok{    }\KeywordTok{ggPacf}\NormalTok{(residus) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{"PACF"}\NormalTok{)}
-\CommentTok{#Modèle bien valide : on remarque que aucun ordre de lag reste significativement non nul dans ACF/PACF}
+\CommentTok{#Modèle bien valide : on remarque que aucun ordre de lag reste significativement non nul}
+\CommentTok{# dans ACF/PACF}
 
 \NormalTok{tseries}\OperatorTok{::}\KeywordTok{jarque.bera.test}\NormalTok{(residus) }\CommentTok{# on ne rejette pas à 5 %. Résidus normaux : }
 \CommentTok{# on peut bien faire les ic}
