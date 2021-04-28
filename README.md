@@ -7,7 +7,7 @@ Son objectif était d'étudier la modélisation d'une série désaisonnalisée d
 
 Cette série a été étudiée par un modèle ARIMA(0,1,1).
 
-Le rapport est disponible [ici](https://aqlt.github.io/ProjetSeriesTemp/Rapport/rapport.pdf) .
+Le rapport est disponible [ici](https://arkensae.github.io/ArimaIPI_FR_auto/Rapport/rapport.pdf) .
 
 
 
